@@ -8,15 +8,15 @@
     "crisisProgressLoss": 0.04
   },
   "eras": [
-    { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0 },
-    { "id": 1, "title": "FOUNDING BUILD", "requiredMilestones": 3 },
-    { "id": 2, "title": "CONTINENTAL EXPANSION", "requiredMilestones": 7 },
-    { "id": 3, "title": "INDUSTRIAL BUILD", "requiredMilestones": 11 },
-    { "id": 4, "title": "ELECTRIFIED NATION", "requiredMilestones": 16 },
-    { "id": 5, "title": "MASS PRODUCTION", "requiredMilestones": 22 },
-    { "id": 6, "title": "SPACE & SILICON", "requiredMilestones": 28 },
-    { "id": 7, "title": "NETWORKED AMERICA", "requiredMilestones": 34 },
-    { "id": 8, "title": "PRESENT DAY", "requiredMilestones": 40 }
+    { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0, "image": "./assets/eras/era-0.png" },
+    { "id": 1, "title": "FOUNDING BUILD", "requiredMilestones": 3, "image": "./assets/eras/era-1.png" },
+    { "id": 2, "title": "CONTINENTAL EXPANSION", "requiredMilestones": 7, "image": "./assets/eras/era-2.png" },
+    { "id": 3, "title": "INDUSTRIAL BUILD", "requiredMilestones": 11, "image": "./assets/eras/era-3.png" },
+    { "id": 4, "title": "ELECTRIFIED NATION", "requiredMilestones": 16, "image": "./assets/eras/era-4.png" },
+    { "id": 5, "title": "MASS PRODUCTION", "requiredMilestones": 22, "image": "./assets/eras/era-5.png" },
+    { "id": 6, "title": "SPACE & SILICON", "requiredMilestones": 28, "image": "./assets/eras/era-6.png" },
+    { "id": 7, "title": "NETWORKED AMERICA", "requiredMilestones": 34, "image": "./assets/eras/era-7.png" },
+    { "id": 8, "title": "PRESENT DAY", "requiredMilestones": 40, "image": "./assets/eras/era-8.png" }
   ],
   "assets": [
     { "id": "workshop", "category": "innovation", "title": "Workshop", "description": "Small teams turn effort into practical inventions.", "baseCost": 20, "cyclesPerSecond": 0.5, "instability": 0.05, "unlockEra": 0 },

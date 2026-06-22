@@ -62,6 +62,19 @@ try {
       };
 
       click("#start-game");
+      document.querySelector("#work-button").dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          button: 0,
+          clientX: 150,
+          clientY: 200,
+          pointerId: 2,
+          pointerType: "mouse",
+        }),
+      );
+      const fireworksTriggered =
+        document.querySelectorAll(".fireworks-canvas").length === 1 &&
+        window.__usaOsFireworks.particles.length > 0;
       click("#work-button", 8);
       click("#deploy-button", 5);
       const workshopButton = document.querySelector(
@@ -88,12 +101,46 @@ try {
       click("#deploy-button", 5);
       click("[data-install='plymouth']");
       click("#save-button");
+      click("[data-tab='policies']");
+      const policiesVisible =
+        !document.querySelector("[data-panel='policies']").hidden &&
+        document.querySelector("[data-panel='systems']").hidden;
+      click("[data-tab='systems']");
+      const initialEraDidNotShake =
+        !document.body.classList.contains("era-change-shake");
+      window.__usaOsState.setDebugEra(0);
+      const debugNext = document.querySelector("[data-debug-era='1']");
+      debugNext.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          button: 0,
+          pointerId: 3,
+          pointerType: "mouse",
+        }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      debugNext.dispatchEvent(
+        new PointerEvent("pointerup", {
+          bubbles: true,
+          button: 0,
+          pointerId: 3,
+          pointerType: "mouse",
+        }),
+      );
+      const debugEraAdvanced =
+        window.__usaOsState.era.id === 1 &&
+        document.querySelector(".era-image").getAttribute("src").endsWith("era-1.png");
+      const eraCelebrationTriggered =
+        document.body.classList.contains("era-change-shake") &&
+        window.__usaOsFireworks.celebrationTimers.size > 0;
+      window.__usaOsState.setDebugEra(null);
 
       return {
         gameVisible: !document.querySelector("#game-screen").hidden,
+        fireworksTriggered,
         installedPlymouth: Boolean(
           [...document.querySelectorAll("#installed-nodes h3")].find((node) =>
-            node.textContent.includes("LAND AT PLYMOUTH"),
+            node.textContent.includes("BEGIN COLONIZATION"),
           ),
         ),
         nextNodeAvailable: Boolean(
@@ -101,6 +148,10 @@ try {
         ),
         workshopOwned: document.body.textContent.includes("Workshop ×1"),
         hasSave: Boolean(localStorage.getItem("usa-os-poc-save-v2")),
+        tabsSwitch: policiesVisible,
+        debugEraAdvanced,
+        initialEraDidNotShake,
+        eraCelebrationTriggered,
         bootFailure: document.body.textContent.includes("BOOT FAILURE"),
       };
     })()
@@ -108,13 +159,42 @@ try {
 
   for (const [name, passed] of Object.entries({
     gameVisible: result.gameVisible,
+    fireworksTriggered: result.fireworksTriggered,
     installedPlymouth: result.installedPlymouth,
     nextNodeAvailable: result.nextNodeAvailable,
     workshopOwned: result.workshopOwned,
     hasSave: result.hasSave,
+    tabsSwitch: result.tabsSwitch,
+    debugEraAdvanced: result.debugEraAdvanced,
+    initialEraDidNotShake: result.initialEraDidNotShake,
+    eraCelebrationTriggered: result.eraCelebrationTriggered,
     noBootFailure: !result.bootFailure,
   })) {
     if (!passed) throw new Error(`Browser assertion failed: ${name}`);
+  }
+
+  const failureScreen = await evaluate(`
+    (() => {
+      const state = window.__usaOsState;
+      state.instability = 99.9;
+      state.tick(10);
+      const visible = !document.querySelector("#game-over-screen").hidden;
+      document.querySelector("#restart-game").click();
+      return {
+        visible,
+        restarted:
+          !document.querySelector("#game-screen").hidden &&
+          state.instability === 0 &&
+          state.gameOver === false,
+      };
+    })()
+  `);
+
+  for (const [name, passed] of Object.entries({
+    gameOverScreenVisible: failureScreen.visible,
+    gameRestarted: failureScreen.restarted,
+  })) {
+    if (!passed) throw new Error(`Game-over assertion failed: ${name}`);
   }
 
   if (process.argv.includes("--screenshot")) {
@@ -140,10 +220,32 @@ try {
       let rounds = 0;
 
       while (!state.isComplete && rounds < 2000) {
+        if (state.gameOver) break;
         const node = state.getAvailableNodes().find((item) => state.canInstall(item));
         if (node) {
           state.install(node.id);
         } else {
+          if (state.stats.netInstabilityPerSecond > 0) {
+            const institution = state
+              .getUnlockedAssets("institutions")
+              .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
+              .filter(({ purchase }) => purchase.cost <= state.progress)
+              .sort(
+                (left, right) =>
+                  right.asset.stabilityPerSecond - left.asset.stabilityPerSecond,
+              )[0];
+            if (institution) {
+              state.setBuyQuantity(1);
+              state.buyAsset(institution.asset.id);
+              rounds += 1;
+              continue;
+            }
+            state.work(100);
+            state.deploy(100);
+            rounds += 1;
+            continue;
+          }
+
           let bought = false;
           for (const category of ["innovation", "infrastructure", "institutions"]) {
             const owned = state
@@ -163,7 +265,15 @@ try {
             }
           }
           if (!bought) {
-            state.tick(10);
+            if (
+              state.stats.cyclesPerSecond === 0 &&
+              state.stats.deployPerSecond === 0
+            ) {
+              state.work(10);
+              state.deploy(10);
+            } else {
+              state.tick(10);
+            }
             if (state.cycles > 0 && state.stats.deployPerSecond === 0) {
               state.deploy(10);
             }
@@ -174,6 +284,7 @@ try {
 
       return {
         rounds,
+        gameOver: state.gameOver,
         victoryVisible: !document.querySelector("#victory-screen").hidden,
         installedCount: document.querySelectorAll("#installed-nodes article").length,
         releaseNotesPresent: document
@@ -185,13 +296,20 @@ try {
 
   for (const [name, passed] of Object.entries({
     victoryVisible: completion.victoryVisible,
+    survivedInstability: !completion.gameOver,
     allNodesInstalled: completion.installedCount === 40,
     releaseNotesPresent: completion.releaseNotesPresent,
   })) {
-    if (!passed) throw new Error(`Completion assertion failed: ${name}`);
+    if (!passed) {
+      throw new Error(
+        `Completion assertion failed: ${name} ${JSON.stringify(completion)}`,
+      );
+    }
   }
 
-  console.log(JSON.stringify({ firstPatch: result, completion }, null, 2));
+  console.log(
+    JSON.stringify({ firstPatch: result, failureScreen, completion }, null, 2),
+  );
   socket.close();
 
   async function evaluate(expression) {

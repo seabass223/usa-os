@@ -9,6 +9,7 @@ export class GameState extends EventTarget {
     this.assetMap = new Map(economy.assets.map((asset) => [asset.id, asset]));
     this.policyMap = new Map(economy.policies.map((policy) => [policy.id, policy]));
     this.timer = null;
+    this.debugEra = this.loadDebugEra();
     this.reset(false);
   }
 
@@ -19,6 +20,7 @@ export class GameState extends EventTarget {
     this.totalProgress = 0;
     this.instability = 0;
     this.crises = 0;
+    this.gameOver = false;
     this.installed = [];
     this.assets = {};
     this.policies = [];
@@ -44,7 +46,7 @@ export class GameState extends EventTarget {
   }
 
   tick(seconds, notify = true) {
-    if (seconds <= 0) return;
+    if (seconds <= 0 || this.gameOver) return;
     const stats = this.stats;
     const produced = stats.cyclesPerSecond * seconds;
     this.cycles += produced;
@@ -58,7 +60,7 @@ export class GameState extends EventTarget {
     const instabilityDelta = stats.netInstabilityPerSecond * seconds;
     this.instability = clamp(this.instability + instabilityDelta, 0, 100);
     if (this.instability >= this.economy.settings.crisisThreshold) {
-      this.triggerCrisis();
+      this.endGame();
     }
 
     this.checkAchievements();
@@ -66,15 +68,54 @@ export class GameState extends EventTarget {
   }
 
   get era() {
+    if (this.debugEra !== null) {
+      return this.economy.eras.find((era) => era.id === this.debugEra);
+    }
     return [...this.economy.eras]
       .reverse()
       .find((era) => this.installed.length >= era.requiredMilestones);
   }
 
   get nextEra() {
+    if (this.debugEra !== null) {
+      return this.economy.eras.find((era) => era.id === this.debugEra + 1);
+    }
     return this.economy.eras.find(
       (era) => era.requiredMilestones > this.installed.length,
     );
+  }
+
+  get debugMode() {
+    return this.debugEra !== null;
+  }
+
+  loadDebugEra() {
+    const raw = localStorage.getItem("usa-os-debug-era");
+    if (raw === null) return null;
+    const era = Number(raw);
+    return Number.isInteger(era) && era >= 0 && era < this.economy.eras.length
+      ? era
+      : null;
+  }
+
+  setDebugEra(era) {
+    if (era === null) {
+      this.debugEra = null;
+      localStorage.removeItem("usa-os-debug-era");
+    } else {
+      this.debugEra = clamp(
+        Number(era),
+        0,
+        this.economy.eras.length - 1,
+      );
+      localStorage.setItem("usa-os-debug-era", String(this.debugEra));
+    }
+    this.changed(false);
+  }
+
+  stepDebugEra(direction) {
+    if (!this.debugMode) return;
+    this.setDebugEra(this.debugEra + direction);
   }
 
   get stats() {
@@ -145,6 +186,7 @@ export class GameState extends EventTarget {
   }
 
   work(times = 1) {
+    if (this.gameOver) return;
     const amount = this.stats.workPerAction * times;
     this.cycles += amount;
     this.totalCycles += amount;
@@ -153,7 +195,7 @@ export class GameState extends EventTarget {
   }
 
   deploy(times = 1) {
-    if (this.cycles <= 0) return;
+    if (this.cycles <= 0 || this.gameOver) return;
     const amount = Math.min(
       this.cycles,
       this.stats.deployPerAction * Math.max(1, times),
@@ -170,9 +212,12 @@ export class GameState extends EventTarget {
   }
 
   getUnlockedAssets(category) {
-    return this.economy.assets.filter(
-      (asset) => asset.category === category && asset.unlockEra <= this.era.id,
-    );
+    return this.economy.assets
+      .filter(
+        (asset) =>
+          asset.category === category && asset.unlockEra <= this.era.id,
+      )
+      .sort((left, right) => right.baseCost - left.baseCost);
   }
 
   getAssetCost(id, requested = this.buyQuantity) {
@@ -203,6 +248,7 @@ export class GameState extends EventTarget {
   }
 
   buyAsset(id) {
+    if (this.gameOver) return false;
     const { quantity, cost } = this.getAssetCost(id);
     if (quantity <= 0 || this.progress + 1e-6 < cost) return false;
     this.progress -= cost;
@@ -223,6 +269,7 @@ export class GameState extends EventTarget {
   }
 
   buyPolicy(id) {
+    if (this.gameOver) return false;
     const policy = this.policyMap.get(id);
     if (
       !policy ||
@@ -255,6 +302,7 @@ export class GameState extends EventTarget {
   }
 
   install(id) {
+    if (this.gameOver) return false;
     const node = this.nodeMap.get(id);
     if (!node || !this.canInstall(node)) return false;
     const oldEra = this.era.id;
@@ -270,15 +318,12 @@ export class GameState extends EventTarget {
     return true;
   }
 
-  triggerCrisis() {
-    const loss = this.progress * this.economy.settings.crisisProgressLoss;
-    this.progress -= loss;
-    this.instability = 35;
-    this.crises += 1;
-    this.log.unshift(
-      `SYSTEM CRISIS: lost ${Math.round(loss).toLocaleString()} progress. Build institutions.`,
-    );
+  endGame() {
+    this.instability = 100;
+    this.gameOver = true;
+    this.log.unshift("FATAL SYSTEM FAILURE: instability reached 100%.");
     this.trimLog();
+    this.save();
   }
 
   checkAchievements() {
@@ -338,6 +383,7 @@ export class GameState extends EventTarget {
         totalProgress: this.totalProgress,
         instability: this.instability,
         crises: this.crises,
+        gameOver: this.gameOver,
         installed: this.installed,
         assets: this.assets,
         policies: this.policies,
@@ -362,6 +408,7 @@ export class GameState extends EventTarget {
       this.totalProgress = Number(save.totalProgress) || 0;
       this.instability = Number(save.instability) || 0;
       this.crises = Number(save.crises) || 0;
+      this.gameOver = Boolean(save.gameOver);
       this.installed = (save.installed ?? []).filter((id) => this.nodeMap.has(id));
       this.assets = save.assets ?? {};
       this.policies = (save.policies ?? []).filter((id) => this.policyMap.has(id));

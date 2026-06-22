@@ -32,6 +32,12 @@ let operations = 0;
 const operationLimit = 20000;
 
 while (!state.isComplete && operations < operationLimit) {
+  if (state.gameOver) {
+    throw new Error(
+      `Stability-aware playthrough ended at ${state.installed.length} milestones.`,
+    );
+  }
+
   let acted = false;
 
   for (const node of state.getAvailableNodes()) {
@@ -42,6 +48,26 @@ while (!state.isComplete && operations < operationLimit) {
     }
   }
   if (acted) continue;
+
+  if (state.stats.netInstabilityPerSecond > 0) {
+    const institution = state
+      .getUnlockedAssets("institutions")
+      .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
+      .filter(({ purchase }) => purchase.cost <= state.progress)
+      .sort(
+        (left, right) =>
+          right.asset.stabilityPerSecond - left.asset.stabilityPerSecond,
+      )[0];
+    if (institution) {
+      state.setBuyQuantity(1);
+      state.buyAsset(institution.asset.id);
+      continue;
+    }
+    state.work(100);
+    state.deploy(100);
+    operations += 1;
+    continue;
+  }
 
   for (const category of ["innovation", "infrastructure", "institutions"]) {
     const categoryOwned = state
@@ -72,7 +98,10 @@ while (!state.isComplete && operations < operationLimit) {
   }
 
   if (state.stats.cyclesPerSecond > 0 || state.stats.deployPerSecond > 0) {
-    state.tick(10);
+    const pressure = Math.max(0, state.stats.netInstabilityPerSecond);
+    const safeSeconds =
+      pressure > 0 ? Math.max(0.1, (95 - state.instability) / pressure) : 10;
+    state.tick(Math.min(10, safeSeconds));
     if (state.cycles > 0 && state.stats.deployPerSecond === 0) state.deploy(10);
   } else {
     state.work(10);
@@ -94,6 +123,21 @@ if (!state.isComplete) {
       }),
   );
 }
+
+const failureState = new GameState(progression, economy);
+failureState.progress = 1000;
+failureState.setBuyQuantity(1);
+failureState.buyAsset("workshop");
+failureState.tick(10000);
+if (!failureState.gameOver || failureState.instability !== 100) {
+  throw new Error("Instability did not produce a terminal game-over state.");
+}
+const frozenProgress = failureState.progress;
+failureState.tick(100);
+failureState.work(100);
+if (failureState.progress !== frozenProgress) {
+  throw new Error("Game state continued changing after game over.");
+}
 console.log(
   JSON.stringify(
     {
@@ -102,6 +146,7 @@ console.log(
       policies: state.policies.length,
       achievements: state.achievements.length,
       crises: state.crises,
+      gameOverTest: failureState.gameOver,
       operations,
       totalProgress: Math.round(state.totalProgress),
     },

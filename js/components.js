@@ -10,9 +10,17 @@ const fullNumberFormatter = new Intl.NumberFormat("en-US", {
 export class StatusBar {
   constructor(element) {
     this.element = element;
+    this.state = null;
+    bindImmediateAction(
+      this.element,
+      "[data-debug-era]",
+      "debugEra",
+      (direction) => this.state?.stepDebugEra(Number(direction)),
+    );
   }
 
   render(state) {
+    this.state = state;
     const stats = state.stats;
     const eraTarget = state.nextEra?.requiredMilestones ?? state.installed.length;
     const eraStart = state.era.requiredMilestones;
@@ -23,46 +31,69 @@ export class StatusBar {
     const pressure = stats.netInstabilityPerSecond;
 
     this.element.innerHTML = `
-      <section class="hero-metrics">
-        ${heroMetric(
-          "CPU CYCLES",
-          formatFull(state.cycles),
-          `${format(stats.cyclesPerSecond)} produced / sec`,
-          "cpu",
-        )}
-        ${heroMetric(
-          "NATIONAL PROGRESS",
-          formatFull(state.progress),
-          `${format(stats.deployPerSecond)} deployed / sec`,
-          "progress",
-        )}
-      </section>
-      <section class="telemetry-grid">
-        <div class="nes-container is-dark telemetry-card">
-          <div class="telemetry-heading">
-            <span>INSTABILITY</span>
-            <strong>${state.instability.toFixed(1)}%</strong>
+      <section class="status-dashboard">
+        <div class="status-left-column">
+          <div class="primary-metric-row">
+            ${heroMetric(
+              "CPU CYCLES",
+              formatFull(state.cycles),
+              `${format(stats.cyclesPerSecond)} produced / sec`,
+              "cpu",
+            )}
+            ${heroMetric(
+              "NATIONAL PROGRESS",
+              formatFull(state.progress),
+              `${format(stats.deployPerSecond)} deployed / sec`,
+              "progress",
+            )}
           </div>
-          <progress class="nes-progress is-error" value="${state.instability}" max="100"></progress>
-          <small>${pressure > 0 ? "RISING" : pressure < 0 ? "FALLING" : "STABLE"} at ${signed(pressure)} / sec</small>
+          <div class="left-telemetry-row">
+            ${balanceCard(stats)}
+            <div class="nes-container is-dark telemetry-card">
+              <div class="telemetry-heading">
+                <span>INSTABILITY</span>
+                <strong>${state.instability.toFixed(1)}%</strong>
+              </div>
+              <progress class="nes-progress is-error" value="${state.instability}" max="100"></progress>
+              <small>${pressure > 0 ? "RISING" : pressure < 0 ? "FALLING" : "STABLE"} at ${signed(pressure)} / sec</small>
+            </div>
+          </div>
         </div>
-        <div class="nes-container is-dark telemetry-card">
-          <div class="telemetry-heading">
-            <span>ERA: ${escapeHtml(state.era.title)}</span>
-            <strong>${state.nextEra ? `${state.installed.length}/${eraTarget}` : "COMPLETE"}</strong>
+
+        <div class="nes-container is-dark with-title era-progress-panel">
+          <p class="title">USA-OS ERA MAP</p>
+          <div class="era-panel-content">
+            <div class="era-image-frame">
+              <img
+                class="era-image"
+                src="${escapeHtml(state.era.image)}"
+                alt="${escapeHtml(state.era.title)} map"
+                width="160"
+                height="90"
+                onerror="this.hidden=true; this.nextElementSibling.hidden=false"
+              >
+              <span class="era-image-placeholder" hidden>ERA MAP</span>
+            </div>
+            <div class="era-panel-data">
+              <div class="era-panel-heading">
+                <span>ERA: ${escapeHtml(state.era.title)}</span>
+                <strong>${state.nextEra ? `${state.installed.length}/${eraTarget}` : "COMPLETE"}</strong>
+              </div>
+              <progress class="nes-progress is-primary" value="${eraProgress}" max="100"></progress>
+              <small>${state.nextEra ? `Next: ${escapeHtml(state.nextEra.title)}` : "Present-day build installed"}</small>
+              ${
+                state.debugMode
+                  ? `
+                    <div class="era-debug-controls">
+                      <button class="nes-btn" type="button" data-debug-era="-1" ${state.era.id === 0 ? "disabled" : ""}>◀ PREV</button>
+                      <span>DEBUG ERA ${state.era.id}</span>
+                      <button class="nes-btn" type="button" data-debug-era="1" ${state.era.id === state.economy.eras.length - 1 ? "disabled" : ""}>NEXT ▶</button>
+                    </div>
+                  `
+                  : ""
+              }
+            </div>
           </div>
-          <progress class="nes-progress is-primary" value="${eraProgress}" max="100"></progress>
-          <small>${state.nextEra ? `Next: ${escapeHtml(state.nextEra.title)}` : "Present-day build installed"}</small>
-        </div>
-        <div class="nes-container is-dark balance-card">
-          <span class="balance-label">SYSTEM BALANCE</span>
-          <div class="balance-bars">
-            ${comparisonBar("PRODUCTION", stats.cyclesPerSecond, Math.max(stats.cyclesPerSecond, stats.deployPerSecond))}
-            ${comparisonBar("DEPLOYMENT", stats.deployPerSecond, Math.max(stats.cyclesPerSecond, stats.deployPerSecond))}
-          </div>
-          <strong class="${stats.cyclesPerSecond > stats.deployPerSecond ? "warning-text" : "success-text"}">
-            ${stats.cyclesPerSecond > stats.deployPerSecond ? "CYCLE BACKLOG FORMING" : "DEPLOYMENT CAPACITY READY"}
-          </strong>
         </div>
       </section>
     `;
@@ -97,6 +128,8 @@ export class CoreControls {
     this.deployOutput.textContent =
       `up to ${format(state.stats.deployPerAction)} stored cycles`;
     this.deployButton.disabled = state.cycles <= 0;
+    this.workButton.disabled = state.gameOver;
+    this.deployButton.disabled = state.gameOver || state.cycles <= 0;
   }
 }
 
@@ -317,10 +350,19 @@ function categoryHelp(category) {
 }
 
 function heroMetric(label, value, detail, type) {
+  const characterCount = String(value).length;
+  const sizeClass =
+    characterCount >= 14
+      ? "value-xxl"
+      : characterCount >= 11
+        ? "value-xl"
+        : characterCount >= 8
+          ? "value-lg"
+          : "";
   return `
     <div class="nes-container is-dark with-title hero-card ${type}">
       <p class="title">${label}</p>
-      <strong class="hero-value">${value}</strong>
+      <strong class="hero-value ${sizeClass}">${value}</strong>
       <span class="hero-detail">${detail}</span>
     </div>
   `;
@@ -336,6 +378,22 @@ function comparisonBar(label, value, maximum) {
       </div>
       <strong>${format(value)}/s</strong>
     </div>
+  `;
+}
+
+function balanceCard(stats) {
+  const maximum = Math.max(stats.cyclesPerSecond, stats.deployPerSecond);
+  return `
+    <section class="nes-container is-dark balance-card">
+      <div class="telemetry-heading">
+        <span>SYSTEM BALANCE</span>
+        <strong>${stats.cyclesPerSecond > stats.deployPerSecond ? "BACKLOG" : "READY"}</strong>
+      </div>
+      <div class="balance-bars">
+        ${comparisonBar("PRODUCTION", stats.cyclesPerSecond, maximum)}
+        ${comparisonBar("DEPLOYMENT", stats.deployPerSecond, maximum)}
+      </div>
+    </section>
   `;
 }
 

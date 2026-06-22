@@ -1,0 +1,73 @@
+{
+  "settings": {
+    "assetCostGrowth": 1.16,
+    "baseWork": 5,
+    "baseDeploy": 8,
+    "offlineCapSeconds": 14400,
+    "crisisThreshold": 100,
+    "crisisProgressLoss": 0.04
+  },
+  "eras": [
+    { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0 },
+    { "id": 1, "title": "FOUNDING BUILD", "requiredMilestones": 3 },
+    { "id": 2, "title": "CONTINENTAL EXPANSION", "requiredMilestones": 7 },
+    { "id": 3, "title": "INDUSTRIAL BUILD", "requiredMilestones": 11 },
+    { "id": 4, "title": "ELECTRIFIED NATION", "requiredMilestones": 16 },
+    { "id": 5, "title": "MASS PRODUCTION", "requiredMilestones": 22 },
+    { "id": 6, "title": "SPACE & SILICON", "requiredMilestones": 28 },
+    { "id": 7, "title": "NETWORKED AMERICA", "requiredMilestones": 34 },
+    { "id": 8, "title": "PRESENT DAY", "requiredMilestones": 40 }
+  ],
+  "assets": [
+    { "id": "workshop", "category": "innovation", "title": "Workshop", "description": "Small teams turn effort into practical inventions.", "baseCost": 20, "cyclesPerSecond": 0.5, "instability": 0.05, "unlockEra": 0 },
+    { "id": "printing-press", "category": "innovation", "title": "Printing Press", "description": "Ideas reproduce faster than people can copy them.", "baseCost": 180, "cyclesPerSecond": 3.5, "instability": 0.08, "unlockEra": 1 },
+    { "id": "textile-mill", "category": "innovation", "title": "Textile Mill", "description": "Mechanized production scales ordinary goods.", "baseCost": 1500, "cyclesPerSecond": 24, "instability": 0.16, "unlockEra": 2 },
+    { "id": "research-lab", "category": "innovation", "title": "Research Laboratory", "description": "Organized science produces a steady invention pipeline.", "baseCost": 14000, "cyclesPerSecond": 165, "instability": 0.12, "unlockEra": 3 },
+    { "id": "assembly-line", "category": "innovation", "title": "Assembly Line", "description": "Specialized work turns designs into mass output.", "baseCost": 120000, "cyclesPerSecond": 1100, "instability": 0.24, "unlockEra": 4 },
+    { "id": "aerospace-facility", "category": "innovation", "title": "Aerospace Facility", "description": "Large engineering programs push the frontier upward.", "baseCost": 950000, "cyclesPerSecond": 7200, "instability": 0.18, "unlockEra": 5 },
+    { "id": "semiconductor-fab", "category": "innovation", "title": "Semiconductor Fab", "description": "Manufacture microscopic switches by the billion.", "baseCost": 8500000, "cyclesPerSecond": 50000, "instability": 0.25, "unlockEra": 6 },
+    { "id": "data-center", "category": "innovation", "title": "Data Center", "description": "Industrialize computation and information storage.", "baseCost": 72000000, "cyclesPerSecond": 350000, "instability": 0.3, "unlockEra": 7 },
+    { "id": "ai-cluster", "category": "innovation", "title": "AI Cluster", "description": "Turn electricity, silicon, and data into machine intelligence.", "baseCost": 650000000, "cyclesPerSecond": 2500000, "instability": 0.42, "unlockEra": 8 },
+
+    { "id": "trading-post", "category": "infrastructure", "title": "Trading Post", "description": "Move stored output into useful progress.", "baseCost": 20, "deployPerSecond": 0.5, "instability": 0.04, "unlockEra": 0 },
+    { "id": "postal-route", "category": "infrastructure", "title": "Postal Route", "description": "Create reliable communication between communities.", "baseCost": 200, "deployPerSecond": 3.8, "instability": 0.05, "unlockEra": 1 },
+    { "id": "canal-network", "category": "infrastructure", "title": "Canal Network", "description": "Move bulk goods across regions at practical cost.", "baseCost": 1700, "deployPerSecond": 26, "instability": 0.08, "unlockEra": 2 },
+    { "id": "rail-network", "category": "infrastructure", "title": "Rail Network", "description": "Connect markets with steel, steam, and standardized time.", "baseCost": 15000, "deployPerSecond": 180, "instability": 0.14, "unlockEra": 3 },
+    { "id": "electrical-grid", "category": "infrastructure", "title": "Electrical Grid", "description": "Deliver power continuously across a national network.", "baseCost": 130000, "deployPerSecond": 1200, "instability": 0.15, "unlockEra": 4 },
+    { "id": "interstate-system", "category": "infrastructure", "title": "Interstate System", "description": "Move people and goods rapidly across the country.", "baseCost": 1100000, "deployPerSecond": 8000, "instability": 0.22, "unlockEra": 5 },
+    { "id": "telecom-network", "category": "infrastructure", "title": "Telecommunications Network", "description": "Route information at electronic speed.", "baseCost": 9200000, "deployPerSecond": 55000, "instability": 0.18, "unlockEra": 6 },
+    { "id": "internet-backbone", "category": "infrastructure", "title": "Internet Backbone", "description": "Distribute digital output nearly everywhere at once.", "baseCost": 80000000, "deployPerSecond": 380000, "instability": 0.25, "unlockEra": 7 },
+    { "id": "satellite-network", "category": "infrastructure", "title": "Satellite Network", "description": "Add a global orbital layer to the national network.", "baseCost": 720000000, "deployPerSecond": 2700000, "instability": 0.3, "unlockEra": 8 },
+
+    { "id": "town-council", "category": "institutions", "title": "Town Council", "description": "Resolve small disputes before they become system failures.", "baseCost": 80, "stabilityPerSecond": 0.08, "unlockEra": 0 },
+    { "id": "courts", "category": "institutions", "title": "Independent Courts", "description": "Apply rules consistently and reduce uncertainty.", "baseCost": 750, "stabilityPerSecond": 0.55, "unlockEra": 1 },
+    { "id": "public-schools", "category": "institutions", "title": "Public Schools", "description": "Develop broad human capacity and continuity.", "baseCost": 6000, "stabilityPerSecond": 3.4, "unlockEra": 2 },
+    { "id": "civil-service", "category": "institutions", "title": "Professional Civil Service", "description": "Keep essential systems running across transitions.", "baseCost": 52000, "stabilityPerSecond": 22, "unlockEra": 3 },
+    { "id": "safety-regulation", "category": "institutions", "title": "Safety Regulation", "description": "Reduce the human cost of rapid industrial growth.", "baseCost": 440000, "stabilityPerSecond": 145, "unlockEra": 4 },
+    { "id": "central-bank", "category": "institutions", "title": "Central Banking", "description": "Absorb financial shocks and coordinate money.", "baseCost": 3600000, "stabilityPerSecond": 950, "unlockEra": 5 },
+    { "id": "environmental-protection", "category": "institutions", "title": "Environmental Protection", "description": "Keep productive capacity from consuming its foundations.", "baseCost": 30000000, "stabilityPerSecond": 6500, "unlockEra": 6 },
+    { "id": "cybersecurity", "category": "institutions", "title": "Cybersecurity Agency", "description": "Protect increasingly networked infrastructure.", "baseCost": 260000000, "stabilityPerSecond": 45000, "unlockEra": 7 },
+    { "id": "resilience-office", "category": "institutions", "title": "National Resilience Office", "description": "Coordinate responses to interconnected disruptions.", "baseCost": 2200000000, "stabilityPerSecond": 320000, "unlockEra": 8 }
+  ],
+  "policies": [
+    { "id": "apprenticeship", "title": "Apprenticeship System", "description": "Manual work and workshops produce twice as much.", "cost": 120, "unlockEra": 0, "effect": { "manualWorkMultiplier": 2, "assets": ["workshop"], "assetMultiplier": 2 } },
+    { "id": "common-standards", "title": "Common Standards", "description": "Manual deployment and trading posts deploy twice as much.", "cost": 140, "unlockEra": 0, "effect": { "manualDeployMultiplier": 2, "assets": ["trading-post"], "assetMultiplier": 2 } },
+    { "id": "patent-system", "title": "Patent System", "description": "All innovation output increases by 50%.", "cost": 1800, "unlockEra": 1, "effect": { "categories": ["innovation"], "categoryMultiplier": 1.5 } },
+    { "id": "postal-act", "title": "Postal Service Act", "description": "All infrastructure throughput increases by 50%.", "cost": 2200, "unlockEra": 1, "effect": { "categories": ["infrastructure"], "categoryMultiplier": 1.5 } },
+    { "id": "land-grant-colleges", "title": "Land-Grant Colleges", "description": "Research laboratories and public schools are twice as effective.", "cost": 26000, "unlockEra": 3, "effect": { "assets": ["research-lab", "public-schools"], "assetMultiplier": 2 } },
+    { "id": "antitrust", "title": "Antitrust Enforcement", "description": "Owned assets generate 20% less instability.", "cost": 180000, "unlockEra": 4, "effect": { "instabilityMultiplier": 0.8 } },
+    { "id": "gi-bill", "title": "GI Bill", "description": "Innovation and institutions are 40% more effective.", "cost": 1800000, "unlockEra": 5, "effect": { "categories": ["innovation", "institutions"], "categoryMultiplier": 1.4 } },
+    { "id": "basic-research", "title": "Federal Basic Research", "description": "Aerospace facilities and semiconductor fabs produce three times as much.", "cost": 19000000, "unlockEra": 6, "effect": { "assets": ["aerospace-facility", "semiconductor-fab"], "assetMultiplier": 3 } },
+    { "id": "open-standards", "title": "Open Internet Standards", "description": "Data centers and internet backbones are three times as effective.", "cost": 170000000, "unlockEra": 7, "effect": { "assets": ["data-center", "internet-backbone"], "assetMultiplier": 3 } },
+    { "id": "domestic-chips", "title": "Domestic Chip Investment", "description": "Semiconductor fabs and AI clusters are four times as effective.", "cost": 1500000000, "unlockEra": 8, "effect": { "assets": ["semiconductor-fab", "ai-cluster"], "assetMultiplier": 4 } }
+  ],
+  "achievements": [
+    { "id": "first-work", "title": "FIRST SHIFT", "metric": "totalCycles", "threshold": 100 },
+    { "id": "first-factory", "title": "AUTOMATION ONLINE", "metric": "assetsOwned", "threshold": 10 },
+    { "id": "balanced", "title": "BALANCED BUILD", "metric": "categoriesOwned", "threshold": 3 },
+    { "id": "million", "title": "MILLION-CYCLE MACHINE", "metric": "totalCycles", "threshold": 1000000 },
+    { "id": "stable", "title": "INSTITUTIONS MATTER", "metric": "institutionsOwned", "threshold": 25 },
+    { "id": "historian", "title": "PATCH HISTORIAN", "metric": "milestones", "threshold": 20 },
+    { "id": "present", "title": "PRESENT DAY BUILD", "metric": "milestones", "threshold": 40 }
+  ]
+}

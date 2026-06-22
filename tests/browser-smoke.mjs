@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { rm } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const edgePath =
@@ -63,7 +63,29 @@ try {
 
       click("#start-game");
       click("#work-button", 8);
-      click("#deploy-button");
+      click("#deploy-button", 5);
+      const workshopButton = document.querySelector(
+        "[data-buy-asset='workshop']",
+      );
+      workshopButton.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          button: 0,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      workshopButton.dispatchEvent(
+        new PointerEvent("pointerup", {
+          bubbles: true,
+          button: 0,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      click("#work-button", 8);
+      click("#deploy-button", 5);
       click("[data-install='plymouth']");
       click("#save-button");
 
@@ -77,7 +99,8 @@ try {
         nextNodeAvailable: Boolean(
           document.querySelector("[data-install='explore']"),
         ),
-        hasSave: Boolean(localStorage.getItem("usa-os-poc-save-v1")),
+        workshopOwned: document.body.textContent.includes("Workshop ×1"),
+        hasSave: Boolean(localStorage.getItem("usa-os-poc-save-v2")),
         bootFailure: document.body.textContent.includes("BOOT FAILURE"),
       };
     })()
@@ -87,28 +110,64 @@ try {
     gameVisible: result.gameVisible,
     installedPlymouth: result.installedPlymouth,
     nextNodeAvailable: result.nextNodeAvailable,
+    workshopOwned: result.workshopOwned,
     hasSave: result.hasSave,
     noBootFailure: !result.bootFailure,
   })) {
     if (!passed) throw new Error(`Browser assertion failed: ${name}`);
   }
 
+  if (process.argv.includes("--screenshot")) {
+    await send("Emulation.setDeviceMetricsOverride", {
+      width: 1600,
+      height: 1000,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    const screenshot = await send("Page.captureScreenshot", {
+      format: "png",
+      captureBeyondViewport: false,
+    });
+    await writeFile(
+      new URL("../tmp-layout-preview.png", import.meta.url),
+      Buffer.from(screenshot.data, "base64"),
+    );
+  }
+
   const completion = await evaluate(`
     (() => {
+      const state = window.__usaOsState;
       let rounds = 0;
 
-      while (document.querySelector("#victory-screen").hidden && rounds < 5000) {
-        const installButton = document.querySelector(
-          "#available-nodes button:not([disabled])",
-        );
-
-        if (installButton) {
-          installButton.click();
+      while (!state.isComplete && rounds < 2000) {
+        const node = state.getAvailableNodes().find((item) => state.canInstall(item));
+        if (node) {
+          state.install(node.id);
         } else {
-          for (let index = 0; index < 10; index += 1) {
-            document.querySelector("#work-button").click();
+          let bought = false;
+          for (const category of ["innovation", "infrastructure", "institutions"]) {
+            const owned = state
+              .getUnlockedAssets(category)
+              .reduce((sum, asset) => sum + (state.assets[asset.id] || 0), 0);
+            const candidate = state
+              .getUnlockedAssets(category)
+              .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
+              .filter(({ purchase }) =>
+                purchase.cost <= state.progress * (owned === 0 ? 1 : 0.35),
+              )
+              .sort((a, b) => a.purchase.cost - b.purchase.cost)[0];
+            if (candidate) {
+              state.setBuyQuantity(1);
+              state.buyAsset(candidate.asset.id);
+              bought = true;
+            }
           }
-          document.querySelector("#deploy-button").click();
+          if (!bought) {
+            state.tick(10);
+            if (state.cycles > 0 && state.stats.deployPerSecond === 0) {
+              state.deploy(10);
+            }
+          }
         }
         rounds += 1;
       }
@@ -126,7 +185,7 @@ try {
 
   for (const [name, passed] of Object.entries({
     victoryVisible: completion.victoryVisible,
-    allNodesInstalled: completion.installedCount === 41,
+    allNodesInstalled: completion.installedCount === 40,
     releaseNotesPresent: completion.releaseNotesPresent,
   })) {
     if (!passed) throw new Error(`Completion assertion failed: ${name}`);

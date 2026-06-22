@@ -385,16 +385,6 @@
       "effect": { "workMultiplier": 1.2, "passiveCycles": 220 }
     },
     {
-      "id": "marriage-equality",
-      "title": "MARRIAGE EQUALITY",
-      "year": "2015",
-      "category": "Social",
-      "description": "Recognize same-sex marriage nationwide under constitutional law.",
-      "cost": 1193000,
-      "requires": ["ada", "smartphones"],
-      "effect": { "deployMultiplier": 1.3 }
-    },
-    {
       "id": "mrna",
       "title": "mRNA VACCINES",
       "year": "2020",
@@ -411,7 +401,7 @@
       "category": "Computing",
       "description": "Scale machine learning into a general-purpose interface and production tool.",
       "cost": 1718000,
-      "requires": ["marriage-equality", "mrna"],
+      "requires": ["smartphones", "mrna"],
       "effect": { "workMultiplier": 1.5, "passiveCycles": 400 }
     }
   ]

@@ -4,76 +4,115 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>USA-OS POC</title>
+    <link rel="stylesheet" href="./vendor/nes.min.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
-      <h1>USA-OS v0.0.1</h1>
-      <p>AN UGLY, PLAYABLE PROOF OF CONCEPT</p>
+    <header class="usa-header">
+      <div>
+        <p class="eyebrow">UNITED SYSTEMS OF AMERICA</p>
+        <h1>USA-OS</h1>
+      </div>
+      <p class="header-version">BUILD v0.2.0</p>
     </header>
 
     <main id="game">
-      <section id="boot-screen">
+      <section id="boot-screen" class="nes-container is-dark with-title">
+        <p class="title">USA-OS BOOTLOADER</p>
         <h2>BOOT DEVICE: MAYFLOWER</h2>
-        <pre>
-LOADING COLONY.KERNEL...
-CALIBRATING QUESTIONABLE HISTORICAL METAPHORS...
-WAITING FOR OPERATOR...
-        </pre>
-        <button id="start-game" type="button">LAND AT PLYMOUTH</button>
-        <button id="continue-game" type="button" hidden>CONTINUE SAVED GAME</button>
+        <pre>LOADING COLONY.KERNEL...
+MOUNTING HISTORY TREE...
+DETECTING HUMAN OPERATOR...
+WAITING...</pre>
+        <button id="start-game" class="nes-btn is-primary" type="button">LAND AT PLYMOUTH</button>
+        <button id="continue-game" class="nes-btn is-success" type="button" hidden>CONTINUE SAVED GAME</button>
       </section>
 
       <section id="game-screen" hidden>
-        <div id="status-bar"></div>
+        <div class="desktop-shell">
+          <aside class="system-sidebar">
+            <section class="nes-container is-dark with-title log-panel">
+              <p class="title">USA-OS LOG</p>
+              <div class="log-status">
+                <i class="nes-icon is-small star"></i>
+                LIVE SYSTEM FEED
+              </div>
+              <ol id="event-log"></ol>
+            </section>
+          </aside>
 
-        <section class="controls panel">
-          <h2>CORE LOOP</h2>
-          <div class="button-row">
-            <button id="work-button" type="button">
-              <strong>[A] DO WORK</strong>
-              <span id="work-output"></span>
-            </button>
-            <button id="deploy-button" type="button">
-              <strong>[B] SHIP PATCH</strong>
-              <span id="deploy-output"></span>
-            </button>
+          <div class="command-center">
+            <div id="status-bar"></div>
+
+            <section class="nes-container is-dark with-title controls">
+              <p class="title">MANUAL COMMANDS</p>
+              <div class="button-row">
+                <button id="work-button" class="nes-btn is-primary" type="button">
+                  <strong>[A] DO WORK</strong>
+                  <span id="work-output"></span>
+                </button>
+                <button id="deploy-button" class="nes-btn is-success" type="button">
+                  <strong>[B] SHIP PROGRESS</strong>
+                  <span id="deploy-output"></span>
+                </button>
+              </div>
+              <p class="hint">
+                Innovation creates cycles. Infrastructure ships them. Fix whichever side is falling behind.
+              </p>
+            </section>
+
+            <section class="nes-container is-dark with-title">
+              <p class="title">REPEATABLE SYSTEMS</p>
+              <div class="section-heading">
+                <p>Prices rise 16% per purchase. Build a machine, then feed it.</p>
+                <div id="buy-quantity" class="quantity-picker">
+                  <button class="nes-btn" data-quantity="1">×1</button>
+                  <button class="nes-btn" data-quantity="10">×10</button>
+                  <button class="nes-btn" data-quantity="100">×100</button>
+                  <button class="nes-btn is-warning" data-quantity="max">MAX</button>
+                </div>
+              </div>
+              <div id="asset-market" class="market-grid"></div>
+            </section>
+
+            <section class="two-column">
+              <div class="nes-container is-dark with-title">
+                <p class="title">POLICY PATCHES</p>
+                <p>One-time upgrades that specialize the economy.</p>
+                <div id="policy-list"></div>
+              </div>
+              <div class="nes-container is-dark with-title">
+                <p class="title">ACHIEVEMENTS</p>
+                <div id="achievements" class="achievement-list"></div>
+              </div>
+            </section>
+
+            <section class="two-column">
+              <div class="nes-container is-dark with-title">
+                <p class="title">AVAILABLE HISTORY PATCHES</p>
+                <div id="available-nodes"></div>
+              </div>
+              <div class="nes-container is-dark with-title">
+                <p class="title">INSTALLED HISTORY</p>
+                <div id="installed-nodes"></div>
+              </div>
+            </section>
+
+            <section class="nes-container is-dark utility-row">
+              <button id="save-button" class="nes-btn is-success" type="button">SAVE SYSTEM</button>
+              <button id="reset-button" class="nes-btn is-error" type="button">ERASE USA-OS</button>
+            </section>
           </div>
-          <p class="hint">
-            A creates CPU cycles. B converts all stored cycles into national
-            progress. Hold a button or hold Shift for 10 operations.
-          </p>
-        </section>
-
-        <section class="layout">
-          <div class="panel">
-            <h2>AVAILABLE PATCHES</h2>
-            <div id="available-nodes"></div>
-          </div>
-
-          <div class="panel">
-            <h2>INSTALLED HISTORY</h2>
-            <div id="installed-nodes"></div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <h2>EVENT LOG</h2>
-          <ol id="event-log"></ol>
-        </section>
-
-        <section class="panel utility-row">
-          <button id="save-button" type="button">SAVE</button>
-          <button id="reset-button" type="button">ERASE USA-OS</button>
-        </section>
+        </div>
       </section>
 
-      <section id="victory-screen" hidden>
+      <section id="victory-screen" class="nes-container is-dark with-title" hidden>
+        <p class="title">MISSION COMPLETE</p>
         <h2>USA-OS: PRESENT DAY BUILD INSTALLED</h2>
         <p id="victory-summary"></p>
         <pre id="release-notes"></pre>
-        <button id="keep-playing" type="button">KEEP OPERATING</button>
-        <button id="new-game" type="button">NEW TIMELINE</button>
+        <button id="keep-playing" class="nes-btn is-success" type="button">KEEP COMPOUNDING</button>
+        <button id="new-game" class="nes-btn is-error" type="button">NEW TIMELINE</button>
       </section>
     </main>
 

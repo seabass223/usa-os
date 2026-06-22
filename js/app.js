@@ -1,103 +1,115 @@
-import { loadProgression } from "./data-loader.js";
+import { loadGameData } from "./data-loader.js";
 import { GameState } from "./game-state.js";
 import {
+  AchievementPanel,
+  AssetMarket,
   buildReleaseNotes,
   CoreControls,
   EventLog,
+  PolicyPanel,
   SkillTree,
   StatusBar,
 } from "./components.js";
 
-const elements = {
-  boot: document.querySelector("#boot-screen"),
-  game: document.querySelector("#game-screen"),
-  victory: document.querySelector("#victory-screen"),
-  start: document.querySelector("#start-game"),
-  continue: document.querySelector("#continue-game"),
-  work: document.querySelector("#work-button"),
-  deploy: document.querySelector("#deploy-button"),
-  workOutput: document.querySelector("#work-output"),
-  deployOutput: document.querySelector("#deploy-output"),
-  save: document.querySelector("#save-button"),
-  reset: document.querySelector("#reset-button"),
-  keepPlaying: document.querySelector("#keep-playing"),
-  newGame: document.querySelector("#new-game"),
-  victorySummary: document.querySelector("#victory-summary"),
-  releaseNotes: document.querySelector("#release-notes"),
-};
+const elements = Object.fromEntries(
+  [
+    "boot-screen",
+    "game-screen",
+    "victory-screen",
+    "start-game",
+    "continue-game",
+    "work-button",
+    "deploy-button",
+    "work-output",
+    "deploy-output",
+    "save-button",
+    "reset-button",
+    "keep-playing",
+    "new-game",
+    "victory-summary",
+    "release-notes",
+  ].map((id) => [id, document.querySelector(`#${id}`)]),
+);
 
 try {
-  const progression = await loadProgression("./data/progression.json");
-  const state = new GameState(progression);
-  const statusBar = new StatusBar(document.querySelector("#status-bar"));
-  const controls = new CoreControls(
-    elements.work,
-    elements.deploy,
-    elements.workOutput,
-    elements.deployOutput,
-    {
-      work: (times) => state.work(times),
-      deploy: (times) => state.deploy(times),
-    },
-  );
-  const tree = new SkillTree(
-    document.querySelector("#available-nodes"),
-    document.querySelector("#installed-nodes"),
-    (id) => state.install(id),
-  );
-  const eventLog = new EventLog(document.querySelector("#event-log"));
+  const { progression, economy } = await loadGameData();
+  const state = new GameState(progression, economy);
+  window.__usaOsState = state;
+  const components = [
+    new StatusBar(document.querySelector("#status-bar")),
+    new CoreControls(
+      elements["work-button"],
+      elements["deploy-button"],
+      elements["work-output"],
+      elements["deploy-output"],
+      {
+        work: (times) => state.work(times),
+        deploy: (times) => state.deploy(times),
+      },
+    ),
+    new AssetMarket(
+      document.querySelector("#asset-market"),
+      document.querySelector("#buy-quantity"),
+      (id) => state.buyAsset(id),
+      (quantity) => state.setBuyQuantity(quantity),
+    ),
+    new PolicyPanel(document.querySelector("#policy-list"), (id) =>
+      state.buyPolicy(id),
+    ),
+    new SkillTree(
+      document.querySelector("#available-nodes"),
+      document.querySelector("#installed-nodes"),
+      (id) => state.install(id),
+    ),
+    new AchievementPanel(document.querySelector("#achievements")),
+    new EventLog(document.querySelector("#event-log")),
+  ];
 
   const render = () => {
-    statusBar.render(state);
-    controls.render(state);
-    tree.render(state);
-    eventLog.render(state);
-
-    if (state.isComplete && !state.victoryAcknowledged) {
-      showVictory(state);
-    }
+    for (const component of components) component.render(state);
+    if (state.isComplete && !state.victoryAcknowledged) showVictory(state);
   };
 
   const startGame = (loadSave = false) => {
     if (loadSave) state.load();
-    elements.boot.hidden = true;
-    elements.victory.hidden = true;
-    elements.game.hidden = false;
+    elements["boot-screen"].hidden = true;
+    elements["victory-screen"].hidden = true;
+    elements["game-screen"].hidden = false;
     state.startTicker();
     render();
   };
 
-  elements.continue.hidden = !state.hasSave();
-  elements.start.addEventListener("click", () => {
+  elements["continue-game"].hidden = !state.hasSave();
+  elements["start-game"].addEventListener("click", () => {
     state.reset();
     startGame();
   });
-  elements.continue.addEventListener("click", () => startGame(true));
-  elements.save.addEventListener("click", () => {
-    state.save();
+  elements["continue-game"].addEventListener("click", () => startGame(true));
+  elements["save-button"].addEventListener("click", () => {
     state.log.unshift("MANUAL SAVE COMPLETE.");
+    state.save();
     render();
   });
-  elements.reset.addEventListener("click", () => {
+  elements["reset-button"].addEventListener("click", () => {
     if (window.confirm("Erase all USA-OS progress?")) {
       state.reset();
       window.location.reload();
     }
   });
-  elements.keepPlaying.addEventListener("click", () => {
+  elements["keep-playing"].addEventListener("click", () => {
     state.acknowledgeVictory();
-    elements.victory.hidden = true;
-    elements.game.hidden = false;
+    elements["victory-screen"].hidden = true;
+    elements["game-screen"].hidden = false;
   });
-  elements.newGame.addEventListener("click", () => {
+  elements["new-game"].addEventListener("click", () => {
     state.reset();
-    elements.victory.hidden = true;
+    elements["victory-screen"].hidden = true;
     startGame();
   });
   state.addEventListener("change", render);
 
   window.addEventListener("keydown", (event) => {
-    if (elements.game.hidden || event.repeat) return;
+    if (elements["game-screen"].hidden || event.repeat) return;
     if (event.key.toLowerCase() === "a") state.work(event.shiftKey ? 10 : 1);
     if (event.key.toLowerCase() === "b") state.deploy(event.shiftKey ? 10 : 1);
   });
@@ -106,16 +118,16 @@ try {
     <section class="panel">
       <h2>BOOT FAILURE</h2>
       <p>${error.message}</p>
-      <p>Run this project through a local static web server so the JSON file can load.</p>
+      <p>Run this project through its local static server.</p>
     </section>
   `;
 }
 
 function showVictory(state) {
   state.save();
-  elements.game.hidden = true;
-  elements.victory.hidden = false;
-  elements.victorySummary.textContent =
+  elements["game-screen"].hidden = true;
+  elements["victory-screen"].hidden = false;
+  elements["victory-summary"].textContent =
     `All ${state.installed.length} historical packages are installed.`;
-  elements.releaseNotes.textContent = buildReleaseNotes(state);
+  elements["release-notes"].textContent = buildReleaseNotes(state);
 }

@@ -21,6 +21,9 @@ const elements = Object.fromEntries(
     "preload-label",
     "preload-progress",
     "intro-voice",
+    "help-open",
+    "help-modal",
+    "help-close",
     "boot-screen",
     "game-screen",
     "victory-screen",
@@ -103,6 +106,16 @@ try {
   attachButtonImpact(elements["work-button"]);
   attachButtonImpact(elements["deploy-button"]);
   attachButtonImpact(elements["save-button"]);
+  attachButtonImpact(elements["help-open"]);
+
+  elements["help-open"].addEventListener("click", () => {
+    elements["help-modal"].showModal();
+  });
+  elements["help-modal"].addEventListener("click", (event) => {
+    if (event.target === elements["help-modal"]) {
+      elements["help-modal"].close();
+    }
+  });
 
   const launchEagle = (message) => {
     eagleSounds.play();
@@ -380,6 +393,7 @@ try {
   state.addEventListener("change", render);
 
   window.addEventListener("keydown", (event) => {
+    if (elements["help-modal"].open) return;
     if (elements["game-screen"].hidden || event.repeat) return;
     if (event.key.toLowerCase() === "a") state.work(event.shiftKey ? 10 : 1);
     if (event.key.toLowerCase() === "b") state.deploy(event.shiftKey ? 10 : 1);

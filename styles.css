@@ -497,6 +497,21 @@ main {
   text-shadow: 5px 5px 0 var(--usa-red);
 }
 
+.header-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.help-button {
+  min-width: 34px;
+  padding: 4px 8px;
+  color: var(--usa-navy) !important;
+  font-size: 0.75rem;
+  line-height: 1;
+  background: white !important;
+}
+
 .eyebrow,
 .header-version {
   margin: 0 0 5px;
@@ -507,6 +522,73 @@ main {
 .header-version {
   color: white;
   text-align: right;
+}
+
+.help-modal {
+  width: min(880px, calc(100vw - 28px));
+  max-height: min(760px, calc(100vh - 28px));
+  padding: 0;
+  color: var(--usa-cream);
+  background: transparent;
+  border: 0;
+}
+
+.help-modal::backdrop {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.3) 0,
+      rgba(0, 0, 0, 0.3) 2px,
+      rgba(0, 0, 0, 0.62) 2px,
+      rgba(0, 0, 0, 0.62) 5px
+    );
+}
+
+.help-modal form {
+  margin: 0;
+}
+
+.help-modal-panel {
+  position: relative;
+  max-height: min(760px, calc(100vh - 28px));
+  overflow: hidden;
+}
+
+.help-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  min-width: 36px;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.help-modal-content {
+  display: grid;
+  gap: 22px;
+  max-height: min(650px, calc(100vh - 132px));
+  padding-right: 6px;
+  overflow-y: auto;
+}
+
+.help-modal h2 {
+  margin: 0 0 14px;
+  color: var(--usa-gold);
+  font-size: 0.85rem;
+}
+
+.help-modal li {
+  margin-bottom: 12px;
+  color: white;
+  font-size: 0.62rem;
+}
+
+.help-modal strong {
+  color: var(--usa-cyan);
+}
+
+.help-modal a {
+  color: var(--usa-green);
 }
 
 .flag-ripple {

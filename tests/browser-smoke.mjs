@@ -63,6 +63,13 @@ try {
 
       const introInitiallyVisible =
         !document.querySelector("#intro-screen").hidden;
+      document.querySelector("#help-open").click();
+      const helpOpened =
+        document.querySelector("#help-modal").open &&
+        document.body.textContent.includes("How to Play") &&
+        document.body.textContent.includes("Credits");
+      document.querySelector("#help-modal").close();
+      const helpClosed = !document.querySelector("#help-modal").open;
       click("#intro-start");
       await new Promise((resolve) => setTimeout(resolve, 2450));
       const introCompleted =
@@ -163,6 +170,8 @@ try {
       return {
         gameVisible: !document.querySelector("#game-screen").hidden,
         introInitiallyVisible,
+        helpOpened,
+        helpClosed,
         introCompleted,
         fireworksTriggered,
         installedPlymouth: Boolean(
@@ -190,6 +199,8 @@ try {
   for (const [name, passed] of Object.entries({
     gameVisible: result.gameVisible,
     introInitiallyVisible: result.introInitiallyVisible,
+    helpOpened: result.helpOpened,
+    helpClosed: result.helpClosed,
     introCompleted: result.introCompleted,
     fireworksTriggered: result.fireworksTriggered,
     installedPlymouth: result.installedPlymouth,

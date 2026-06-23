@@ -3,14 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>USA-OS POC</title>
-    <meta property="og:title" content="USA-OS" />
-    <meta property="og:description" content="An 8-bit America OS incremental strategy game." />
+    <title>USA-OS America 250</title>
+    <meta name="description" content="Build America as an 8-bit operating system in a clicky incremental strategy game about innovation, infrastructure, institutions, policy, and historical progress." />
+    <meta property="og:title" content="USA-OS America 250" />
+    <meta property="og:description" content="Build America as an 8-bit operating system in a clicky incremental strategy game about innovation, infrastructure, institutions, policy, and historical progress." />
     <meta property="og:image" content="https://kylephoto.blob.core.windows.net/summer-into-ai/usa-os/assets/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="USA-OS America 250" />
+    <meta name="twitter:description" content="Build America as an 8-bit operating system in a clicky incremental strategy game about innovation, infrastructure, institutions, policy, and historical progress." />
     <meta name="twitter:image" content="https://kylephoto.blob.core.windows.net/summer-into-ai/usa-os/assets/og.png" />
+    <link rel="icon" href="https://kylephoto.blob.core.windows.net/summer-into-ai/usa-os/assets/icons/favicon.ico" />
     <link rel="stylesheet" href="./vendor/nes.min.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -40,7 +44,12 @@
         <p class="eyebrow">UNITED SYSTEMS OF AMERICA</p>
         <h1>USA-OS</h1>
       </div>
-      <p class="header-version">BUILD v0.2.0</p>
+      <div class="header-actions">
+        <button id="help-open" class="nes-btn help-button" type="button" aria-label="Open USA-OS help">
+          ?
+        </button>
+        <p class="header-version">BUILD v0.2.0</p>
+      </div>
       <div class="flag-ripple" aria-hidden="true">
         <span style="--slice:0"></span><span style="--slice:1"></span>
         <span style="--slice:2"></span><span style="--slice:3"></span>
@@ -60,6 +69,44 @@
         <span style="--slice:30"></span><span style="--slice:31"></span>
       </div>
     </header>
+
+    <dialog id="help-modal" class="help-modal nes-dialog is-dark">
+      <form method="dialog">
+        <section class="nes-container is-dark with-title help-modal-panel">
+          <p class="title">USA-OS HELP</p>
+          <button id="help-close" class="nes-btn is-error help-close" type="submit" aria-label="Close help">
+            ×
+          </button>
+
+          <div class="help-modal-content">
+            <section>
+              <h2>How to Play</h2>
+              <ol>
+                <li>Click <strong>DO WORK</strong> to create CPU cycles.</li>
+                <li>Click <strong>SHIP PROGRESS</strong> to convert stored cycles into National Progress.</li>
+                <li>Spend Progress on repeatable Systems: Innovation makes cycles, Infrastructure ships progress, and Institutions reduce instability.</li>
+                <li>Install Policies for one-time upgrades that specialize the economy.</li>
+                <li>Advance History to unlock eras, new systems, and stronger upgrades.</li>
+                <li>Keep System Balance healthy. If Instability reaches 100%, USA-OS crashes and the timeline ends.</li>
+                <li>Unlock medals by hitting major milestones. The Freedom Eagle will let you know.</li>
+              </ol>
+            </section>
+
+            <section>
+              <h2>Credits</h2>
+              <ul>
+                <li><strong>Codex:</strong> game code, systems design, UI iteration, debugging, and deployment workflow were built collaboratively with Codex.</li>
+                <li><strong>ChatGPT 5.5:</strong> era images, icon concepts, and visual prompts were created with ChatGPT 5.5.</li>
+                <li><strong>Music:</strong> the 8-bit USA-OS music was generated with <a href="https://suno.com" target="_blank" rel="noopener noreferrer">Suno</a>.</li>
+                <li><strong>Sound effects:</strong> most SFX were made with <a href="https://www.optimizerai.xyz" target="_blank" rel="noopener noreferrer">OptimizerAI</a>.</li>
+                <li><strong>Eagle scream:</strong> created locally with <a href="https://huggingface.co/stabilityai/stable-audio-3-small-sfx" target="_blank" rel="noopener noreferrer">Stable Audio 3 Small SFX</a>.</li>
+                <li><strong>Eagle sprite:</strong> base sprite generated with GPT, then heavily hand-edited in Photoshop.</li>
+              </ul>
+            </section>
+          </div>
+        </section>
+      </form>
+    </dialog>
 
     <main id="game">
       <section id="boot-screen" class="nes-container is-dark with-title" hidden>

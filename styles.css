@@ -31,6 +31,27 @@ button {
   box-sizing: border-box;
 }
 
+.mobile-device-message {
+  display: none;
+}
+
+.mobile-device-panel {
+  width: min(520px, calc(100vw - 28px));
+  text-align: center;
+}
+
+.mobile-device-panel h1 {
+  margin: 8px 0 18px;
+  color: var(--usa-gold);
+  font-size: clamp(1rem, 7vw, 1.55rem);
+  line-height: 1.45;
+}
+
+.mobile-device-panel p {
+  color: white;
+  font-size: 0.62rem;
+}
+
 .intro-screen {
   position: fixed;
   z-index: 10000;
@@ -585,6 +606,10 @@ main {
 
 .help-modal strong {
   color: var(--usa-cyan);
+}
+
+.help-modal .help-command-deploy {
+  color: var(--usa-green);
 }
 
 .help-modal a {
@@ -1393,5 +1418,37 @@ pre {
 
   .utility-row {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+  body {
+    min-height: 100vh;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .mobile-device-message {
+    position: fixed;
+    z-index: 20000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background:
+      linear-gradient(rgba(7, 27, 61, 0.94), rgba(7, 27, 61, 0.98)),
+      repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.25) 0,
+        rgba(0, 0, 0, 0.25) 2px,
+        transparent 2px,
+        transparent 5px
+      );
+  }
+
+  .intro-screen,
+  .usa-header,
+  #game {
+    display: none !important;
   }
 }

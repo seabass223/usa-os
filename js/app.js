@@ -52,7 +52,7 @@ try {
   });
   const eraUnlockSound = new SoundPool("./assets/audio/vo-unlock.mp3", {
     initialSize: 2,
-    volume: 0.85,
+    volume: 1,
   });
   const coinSounds = new SoundPool("./assets/audio/coin.mp3", {
     initialSize: 6,
@@ -153,6 +153,8 @@ try {
     );
   };
 
+  let musicStoppedForGameOver = false;
+
   const render = () => {
     const currentEraId = state.era.id;
     if (observedEraId !== null && currentEraId !== observedEraId) {
@@ -162,6 +164,7 @@ try {
 
     for (const component of components) component.render(state);
     if (state.gameOver) {
+      stopMusic();
       showGameOver(state);
     } else if (state.isComplete && !state.victoryAcknowledged) {
       showVictory(state);
@@ -180,10 +183,18 @@ try {
   };
 
   const startMusic = () => {
+    musicStoppedForGameOver = false;
     elements["background-music"].volume = 0.45;
     elements["background-music"].play().catch(() => {
       // Playback remains optional if the browser or user blocks audio.
     });
+  };
+
+  const stopMusic = () => {
+    if (musicStoppedForGameOver) return;
+    musicStoppedForGameOver = true;
+    elements["background-music"].pause();
+    elements["background-music"].currentTime = 0;
   };
 
   let introFinished = false;
@@ -214,7 +225,8 @@ try {
   elements["continue-game"].hidden = !state.hasSave();
   elements["start-game"].addEventListener("click", () => {
     startMusic();
-    state.reset();
+    observedEraId = null;
+    state.reset(false);
     startGame();
   });
   elements["continue-game"].addEventListener("click", () => {
@@ -238,14 +250,16 @@ try {
     elements["game-screen"].hidden = false;
   });
   elements["new-game"].addEventListener("click", () => {
-    state.reset();
+    observedEraId = null;
+    state.reset(false);
     elements["victory-screen"].hidden = true;
     startGame();
   });
   elements["restart-game"].addEventListener("click", () => {
-    state.reset();
-    observedEraId = state.era.id;
+    observedEraId = null;
+    state.reset(false);
     elements["game-over-screen"].hidden = true;
+    startMusic();
     startGame();
   });
   state.addEventListener("change", render);

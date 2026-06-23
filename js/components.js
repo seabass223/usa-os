@@ -7,6 +7,10 @@ const fullNumberFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const actionNumberFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 2,
+});
+
 export class StatusBar {
   constructor(element) {
     this.element = element;
@@ -124,9 +128,12 @@ export class CoreControls {
   }
 
   render(state) {
-    this.workOutput.textContent = `+${format(state.stats.workPerAction)} cycles`;
+    const stats = state.stats;
+    const deployAmount = Math.min(state.cycles, stats.deployPerAction);
+
+    this.workOutput.textContent = `+${formatAction(stats.workPerAction)} cycles`;
     this.deployOutput.textContent =
-      `up to ${format(state.stats.deployPerAction)} stored cycles`;
+      `+${formatAction(deployAmount)} progress`;
     this.deployButton.disabled = state.cycles <= 0;
     this.workButton.disabled = state.gameOver;
     this.deployButton.disabled = state.gameOver || state.cycles <= 0;
@@ -435,6 +442,10 @@ export function format(value) {
 
 export function formatFull(value) {
   return fullNumberFormatter.format(Math.max(0, Number(value) || 0));
+}
+
+function formatAction(value) {
+  return actionNumberFormatter.format(Math.max(0, Number(value) || 0));
 }
 
 function escapeHtml(value) {

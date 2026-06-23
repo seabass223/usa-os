@@ -16,7 +16,11 @@
         </h1>
         <p class="intro-version">250TH ANNIVERSARY EDITION</p>
         <div class="intro-stars" aria-hidden="true">★ ★ ★</div>
-        <button id="intro-start" class="nes-btn is-primary intro-start" type="button">
+        <div class="intro-preload" aria-live="polite">
+          <span id="preload-label">LOADING USA-OS ASSETS...</span>
+          <progress id="preload-progress" class="nes-progress is-primary" value="0" max="100"></progress>
+        </div>
+        <button id="intro-start" class="nes-btn is-primary intro-start" type="button" disabled>
           PRESS START
         </button>
         <p class="intro-copyright">© 1776–2026 USA-OS</p>

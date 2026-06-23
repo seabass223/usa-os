@@ -15,6 +15,15 @@ node scripts/serve.mjs
 
 Then open `http://localhost:8000`.
 
+## Build
+
+```powershell
+yarn build
+```
+
+This deletes and recreates `dist/` every time, then copies the static production
+files into it. Deploy the contents of `dist/`.
+
 ## Controls
 
 - `A`: generate CPU cycles.
@@ -41,7 +50,7 @@ node tests/browser-smoke.mjs
 ```
 
 The first test completes the economy directly. The second uses installed
-Microsoft Edge in headless mode to click from boot through all 41 nodes and
+Microsoft Edge in headless mode to click from boot through all 40 nodes and
 assert the victory screen.
 
 ## Structure

@@ -1,4 +1,5 @@
 import { loadGameData } from "./data-loader.js";
+import { preloadAssets } from "./asset-preloader.js";
 import { GameState } from "./game-state.js";
 import { PixelFireworks } from "./fireworks.js";
 import { SoundPool } from "./sound-pool.js";
@@ -17,6 +18,8 @@ const elements = Object.fromEntries(
   [
     "intro-screen",
     "intro-start",
+    "preload-label",
+    "preload-progress",
     "intro-voice",
     "boot-screen",
     "game-screen",
@@ -42,6 +45,16 @@ const elements = Object.fromEntries(
 
 try {
   const { progression, economy } = await loadGameData();
+  await preloadAssets(buildAssetManifest(economy), ({ completed, total, percent }) => {
+    elements["preload-progress"].value = percent;
+    elements["preload-label"].textContent =
+      `LOADING USA-OS ASSETS... ${completed}/${total}`;
+  });
+  elements["preload-progress"].value = 100;
+  elements["preload-label"].textContent = "USA-OS ASSETS READY";
+  elements["intro-screen"].classList.add("intro-ready");
+  elements["intro-start"].disabled = false;
+
   const state = new GameState(progression, economy);
   window.__usaOsState = state;
   const fireworks = new PixelFireworks();
@@ -58,12 +71,19 @@ try {
     initialSize: 6,
     volume: 0.7,
   });
+  const eagleSounds = new SoundPool("./assets/audio/eagle.mp3", {
+    initialSize: 3,
+    volume: 0.9,
+  });
   const patrioticFireworks = {
     colors: ["#d52b1e", "#ffffff", "#2878d0"],
     onBurst: () => popSounds.play(),
   };
   fireworks.attach(elements["work-button"], patrioticFireworks);
   fireworks.attach(elements["deploy-button"], patrioticFireworks);
+  const achievementById = new Map(
+    economy.achievements.map((achievement) => [achievement.id, achievement]),
+  );
 
   const attachButtonImpact = (button) => {
     button.addEventListener(
@@ -82,6 +102,50 @@ try {
   };
   attachButtonImpact(elements["work-button"]);
   attachButtonImpact(elements["deploy-button"]);
+
+  const launchEagle = (message) => {
+    eagleSounds.play();
+
+    const flyover = document.createElement("div");
+    flyover.className = "eagle-flyover";
+    flyover.setAttribute("role", "status");
+    flyover.setAttribute("aria-live", "polite");
+
+    const content = document.createElement("div");
+    content.className = "eagle-flyover-content";
+
+    const leftMedal = createMedalIcon();
+    const text = document.createElement("strong");
+    text.textContent = message;
+    const rightMedal = createMedalIcon();
+
+    const eagle = document.createElement("div");
+    eagle.className = "eagle-flyover-sprite";
+    eagle.setAttribute("aria-hidden", "true");
+
+    content.append(leftMedal, text, rightMedal);
+    flyover.append(content, eagle);
+    document.body.append(flyover);
+
+    flyover.addEventListener("animationend", (event) => {
+      if (event.animationName === "eagle-flyover-band") {
+        flyover.remove();
+      }
+    });
+    window.setTimeout(() => flyover.remove(), 1800);
+  };
+
+  const createMedalIcon = () => {
+    const medal = document.createElement("img");
+    medal.src = "./assets/icons/tabs/medals.png";
+    medal.alt = "";
+    medal.width = 24;
+    medal.height = 24;
+    medal.className = "eagle-flyover-medal";
+    medal.onerror = () => medal.remove();
+    return medal;
+  };
+
   const components = [
     new StatusBar(document.querySelector("#status-bar")),
     new CoreControls(
@@ -134,6 +198,8 @@ try {
   }
 
   let observedEraId = null;
+  let observedAchievementIds = new Set(state.achievements);
+  let suppressAchievementFlyovers = false;
   let shakeTimer = null;
 
   const celebrateEraChange = () => {
@@ -155,12 +221,27 @@ try {
 
   let musicStoppedForGameOver = false;
 
+  const primeAchievementWatcher = () => {
+    observedAchievementIds = new Set(state.achievements);
+  };
+
+  const announceNewAchievements = () => {
+    if (suppressAchievementFlyovers) return;
+    for (const id of state.achievements) {
+      if (observedAchievementIds.has(id)) continue;
+      observedAchievementIds.add(id);
+      const title = achievementById.get(id)?.title ?? "MEDAL UNLOCKED";
+      launchEagle(title);
+    }
+  };
+
   const render = () => {
     const currentEraId = state.era.id;
     if (observedEraId !== null && currentEraId !== observedEraId) {
       celebrateEraChange();
     }
     observedEraId = currentEraId;
+    announceNewAchievements();
 
     for (const component of components) component.render(state);
     if (state.gameOver) {
@@ -172,7 +253,14 @@ try {
   };
 
   const startGame = (loadSave = false) => {
-    if (loadSave) state.load();
+    if (loadSave) {
+      suppressAchievementFlyovers = true;
+      state.load();
+      primeAchievementWatcher();
+      suppressAchievementFlyovers = false;
+    } else {
+      primeAchievementWatcher();
+    }
     observedEraId = state.era.id;
     elements["boot-screen"].hidden = true;
     elements["victory-screen"].hidden = true;
@@ -297,4 +385,22 @@ function showGameOver(state) {
     `FINAL ERA: ${state.era.title}\n` +
     `HISTORY PATCHES: ${state.installed.length}/${state.progression.nodes.length}\n` +
     `PROGRESS SHIPPED: ${Math.round(state.totalProgress).toLocaleString()}`;
+}
+
+function buildAssetManifest(economy) {
+  return [
+    { type: "font", name: "Press Start 2P" },
+    { type: "audio", src: "./assets/audio/Usa-Os.mp3" },
+    { type: "audio", src: "./assets/audio/coin.mp3" },
+    { type: "audio", src: "./assets/audio/eagle.mp3" },
+    { type: "audio", src: "./assets/audio/pop.mp3" },
+    { type: "audio", src: "./assets/audio/vo-unlock.mp3" },
+    { type: "audio", src: "./assets/audio/vo-usa-os.mp3" },
+    { type: "image", src: "./assets/icons/tabs/systems.png" },
+    { type: "image", src: "./assets/icons/tabs/policies.png" },
+    { type: "image", src: "./assets/icons/tabs/history.png" },
+    { type: "image", src: "./assets/icons/tabs/medals.png" },
+    { type: "image", src: "./assets/sprites/eagle.png" },
+    ...economy.eras.map((era) => ({ type: "image", src: era.image })),
+  ];
 }

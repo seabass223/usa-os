@@ -1,0 +1,13 @@
+{
+  "name": "usa-os",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.9.2",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test:playthrough": "node tests/playthrough.mjs",
+    "test:browser": "node tests/browser-smoke.mjs"
+  }
+}

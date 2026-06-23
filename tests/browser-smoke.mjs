@@ -108,6 +108,24 @@ try {
       click("#deploy-button", 5);
       click("[data-install='plymouth']");
       click("#save-button");
+      const manualSaveFeedback =
+        document.querySelector("#save-button").textContent.trim() ===
+        "SYSTEM SAVED";
+      const manualSaveLogged = document
+        .querySelector("#event-log")
+        .textContent.includes("MANUAL SAVE COMPLETE");
+      const saveBeforeConstructor = localStorage.getItem("usa-os-poc-save-v2");
+      const [{ GameState }, progression, economy] = await Promise.all([
+        import("./js/game-state.js"),
+        fetch("./data/progression.json").then((response) => response.json()),
+        fetch("./data/economy.json").then((response) => response.json()),
+      ]);
+      const freshState = new GameState(progression, economy);
+      const saveSurvivedFreshConstructor =
+        Boolean(saveBeforeConstructor) &&
+        Boolean(localStorage.getItem("usa-os-poc-save-v2")) &&
+        freshState.hasSave() &&
+        freshState.load();
       click("[data-tab='policies']");
       const policiesVisible =
         !document.querySelector("[data-panel='policies']").hidden &&
@@ -157,6 +175,9 @@ try {
         ),
         workshopOwned: document.body.textContent.includes("Workshop ×1"),
         hasSave: Boolean(localStorage.getItem("usa-os-poc-save-v2")),
+        manualSaveFeedback,
+        manualSaveLogged,
+        saveSurvivedFreshConstructor,
         tabsSwitch: policiesVisible,
         debugEraAdvanced,
         initialEraDidNotShake,
@@ -175,6 +196,9 @@ try {
     nextNodeAvailable: result.nextNodeAvailable,
     workshopOwned: result.workshopOwned,
     hasSave: result.hasSave,
+    manualSaveFeedback: result.manualSaveFeedback,
+    manualSaveLogged: result.manualSaveLogged,
+    saveSurvivedFreshConstructor: result.saveSurvivedFreshConstructor,
     tabsSwitch: result.tabsSwitch,
     debugEraAdvanced: result.debugEraAdvanced,
     initialEraDidNotShake: result.initialEraDidNotShake,

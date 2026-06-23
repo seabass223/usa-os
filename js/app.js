@@ -102,6 +102,7 @@ try {
   };
   attachButtonImpact(elements["work-button"]);
   attachButtonImpact(elements["deploy-button"]);
+  attachButtonImpact(elements["save-button"]);
 
   const launchEagle = (message) => {
     eagleSounds.play();
@@ -321,10 +322,36 @@ try {
     startMusic();
     startGame(true);
   });
+  let saveFeedbackTimer = null;
+  const showSaveFeedback = (label, className) => {
+    const button = elements["save-button"];
+    button.textContent = label;
+    button.classList.toggle("is-success", className === "success");
+    button.classList.toggle("is-error", className === "error");
+    window.clearTimeout(saveFeedbackTimer);
+    saveFeedbackTimer = window.setTimeout(() => {
+      button.textContent = "SAVE SYSTEM";
+      button.classList.add("is-success");
+      button.classList.remove("is-error");
+    }, 1400);
+  };
+
   elements["save-button"].addEventListener("click", () => {
-    state.log.unshift("MANUAL SAVE COMPLETE.");
-    state.save();
-    render();
+    try {
+      state.log.unshift(
+        `MANUAL SAVE COMPLETE: ${new Date().toLocaleTimeString()}.`,
+      );
+      state.trimLog();
+      state.save();
+      render();
+      showSaveFeedback("SYSTEM SAVED", "success");
+    } catch (error) {
+      state.log.unshift("MANUAL SAVE FAILED.");
+      state.trimLog();
+      render();
+      showSaveFeedback("SAVE FAILED", "error");
+      console.error(error);
+    }
   });
   elements["reset-button"].addEventListener("click", () => {
     if (window.confirm("Erase all USA-OS progress?")) {

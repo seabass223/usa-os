@@ -24,6 +24,33 @@ yarn build
 This deletes and recreates `dist/` every time, then copies the static production
 files into it. Deploy the contents of `dist/`.
 
+## Deploy
+
+```powershell
+yarn deploy
+```
+
+Deploy builds first, then replaces the Azure Blob Storage virtual directory:
+
+- Storage account: `kylephoto`
+- Blob container: `summer-into-ai`
+- Virtual directory: `usa-os`
+
+It deletes existing blobs matching `usa-os/*`, then uploads the fresh contents
+of `dist/` to `summer-into-ai/usa-os/`.
+
+Requirements:
+
+- Azure CLI installed
+- `az login` completed with permission to query the `kylephoto` storage account key,
+  or an Azure CLI environment that can otherwise use storage account key auth
+
+To preview the Azure commands without changing blob storage:
+
+```powershell
+yarn deploy:dry-run
+```
+
 ## Controls
 
 - `A`: generate CPU cycles.

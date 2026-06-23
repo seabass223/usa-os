@@ -124,6 +124,23 @@ if (!state.isComplete) {
   );
 }
 
+state.save();
+const savedProgress = state.progress;
+const savedInstalled = state.installed.length;
+const reloadedState = new GameState(progression, economy);
+if (!reloadedState.hasSave()) {
+  throw new Error("Constructing GameState erased an existing saved game.");
+}
+if (!reloadedState.load()) {
+  throw new Error("Saved game did not load.");
+}
+if (
+  reloadedState.installed.length !== savedInstalled ||
+  reloadedState.progress < savedProgress
+) {
+  throw new Error("Saved game did not restore the expected state.");
+}
+
 const failureState = new GameState(progression, economy);
 failureState.progress = 1000;
 failureState.setBuyQuantity(1);

@@ -10,10 +10,10 @@ export class GameState extends EventTarget {
     this.policyMap = new Map(economy.policies.map((policy) => [policy.id, policy]));
     this.timer = null;
     this.debugEra = this.loadDebugEra();
-    this.reset(false);
+    this.reset(false, { clearSave: false });
   }
 
-  reset(notify = true) {
+  reset(notify = true, { clearSave = true } = {}) {
     this.cycles = 0;
     this.progress = 0;
     this.totalCycles = 0;
@@ -30,7 +30,7 @@ export class GameState extends EventTarget {
     this.lastTickAt = Date.now();
     this.log = ["USA-OS awaiting first work cycle."];
     this.victoryAcknowledged = false;
-    localStorage.removeItem(SAVE_KEY);
+    if (clearSave) localStorage.removeItem(SAVE_KEY);
     if (notify) this.changed();
   }
 

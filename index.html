@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>USA-OS POC</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>USA-OS v0.0.1</h1>
+      <p>AN UGLY, PLAYABLE PROOF OF CONCEPT</p>
+    </header>
+
+    <main id="game">
+      <section id="boot-screen">
+        <h2>BOOT DEVICE: MAYFLOWER</h2>
+        <pre>
+LOADING COLONY.KERNEL...
+CALIBRATING QUESTIONABLE HISTORICAL METAPHORS...
+WAITING FOR OPERATOR...
+        </pre>
+        <button id="start-game" type="button">LAND AT PLYMOUTH</button>
+        <button id="continue-game" type="button" hidden>CONTINUE SAVED GAME</button>
+      </section>
+
+      <section id="game-screen" hidden>
+        <div id="status-bar"></div>
+
+        <section class="controls panel">
+          <h2>CORE LOOP</h2>
+          <div class="button-row">
+            <button id="work-button" type="button">
+              <strong>[A] DO WORK</strong>
+              <span id="work-output"></span>
+            </button>
+            <button id="deploy-button" type="button">
+              <strong>[B] SHIP PATCH</strong>
+              <span id="deploy-output"></span>
+            </button>
+          </div>
+          <p class="hint">
+            A creates CPU cycles. B converts all stored cycles into national
+            progress. Hold a button or hold Shift for 10 operations.
+          </p>
+        </section>
+
+        <section class="layout">
+          <div class="panel">
+            <h2>AVAILABLE PATCHES</h2>
+            <div id="available-nodes"></div>
+          </div>
+
+          <div class="panel">
+            <h2>INSTALLED HISTORY</h2>
+            <div id="installed-nodes"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>EVENT LOG</h2>
+          <ol id="event-log"></ol>
+        </section>
+
+        <section class="panel utility-row">
+          <button id="save-button" type="button">SAVE</button>
+          <button id="reset-button" type="button">ERASE USA-OS</button>
+        </section>
+      </section>
+
+      <section id="victory-screen" hidden>
+        <h2>USA-OS: PRESENT DAY BUILD INSTALLED</h2>
+        <p id="victory-summary"></p>
+        <pre id="release-notes"></pre>
+        <button id="keep-playing" type="button">KEEP OPERATING</button>
+        <button id="new-game" type="button">NEW TIMELINE</button>
+      </section>
+    </main>
+
+    <noscript>This prototype requires JavaScript.</noscript>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,418 @@
+{
+  "settings": {
+    "baseWork": 5,
+    "baseConversion": 0.5
+  },
+  "nodes": [
+    {
+      "id": "plymouth",
+      "title": "LAND AT PLYMOUTH",
+      "year": "1620",
+      "category": "Expansion",
+      "description": "Establish a precarious settlement and begin the operating session.",
+      "cost": 20,
+      "requires": [],
+      "effect": { "workMultiplier": 1.5 }
+    },
+    {
+      "id": "explore",
+      "title": "EXPLORE THE LAND",
+      "year": "1600s",
+      "category": "Expansion",
+      "description": "Map unfamiliar territory already inhabited by many Indigenous nations.",
+      "cost": 50,
+      "requires": ["plymouth"],
+      "effect": { "workMultiplier": 1.35, "passiveCycles": 1 }
+    },
+    {
+      "id": "colonies",
+      "title": "13 ORIGINAL COLONIES",
+      "year": "1732",
+      "category": "Governance",
+      "description": "Connect thirteen distinct colonial systems along the Atlantic coast.",
+      "cost": 110,
+      "requires": ["explore"],
+      "effect": { "deployMultiplier": 1.35, "passiveCycles": 1 }
+    },
+    {
+      "id": "louisiana",
+      "title": "LOUISIANA PURCHASE",
+      "year": "1803",
+      "category": "Expansion",
+      "description": "Acquire a vast territory while creating new sovereignty conflicts.",
+      "cost": 220,
+      "requires": ["colonies"],
+      "effect": { "workMultiplier": 1.4 }
+    },
+    {
+      "id": "oregon",
+      "title": "OREGON TRAIL",
+      "year": "1840s",
+      "category": "Expansion",
+      "description": "Move people west through difficult terrain and frequent system failures.",
+      "cost": 400,
+      "requires": ["louisiana"],
+      "effect": { "workMultiplier": 1.3, "passiveCycles": 2 }
+    },
+    {
+      "id": "railroads",
+      "title": "RAILROADS",
+      "year": "1869",
+      "category": "Infrastructure",
+      "description": "Connect distant regions with steel, steam, labor, and standardized time.",
+      "cost": 700,
+      "requires": ["oregon"],
+      "effect": { "workMultiplier": 1.35, "passiveCycles": 3 }
+    },
+    {
+      "id": "industrial",
+      "title": "INDUSTRIAL REVOLUTION",
+      "year": "1800s",
+      "category": "Industry",
+      "description": "Scale production dramatically, along with its labor and pollution bugs.",
+      "cost": 1100,
+      "requires": ["railroads"],
+      "effect": { "workMultiplier": 1.5, "passiveCycles": 4 }
+    },
+    {
+      "id": "flight",
+      "title": "FLIGHT",
+      "year": "1903",
+      "category": "Invention",
+      "description": "Turn controlled powered flight into a new mobility layer.",
+      "cost": 1700,
+      "requires": ["industrial"],
+      "effect": { "workMultiplier": 1.3, "deployMultiplier": 1.15 }
+    },
+    {
+      "id": "electricity",
+      "title": "ELECTRICITY",
+      "year": "1880s",
+      "category": "Infrastructure",
+      "description": "Deploy a practical electrical grid and power modern life.",
+      "cost": 2600,
+      "requires": ["flight"],
+      "effect": { "workMultiplier": 1.45, "passiveCycles": 8 }
+    },
+    {
+      "id": "microchips",
+      "title": "MICROCHIPS",
+      "year": "1958",
+      "category": "Computing",
+      "description": "Integrate electronic circuits into tiny, scalable packages.",
+      "cost": 4000,
+      "requires": ["electricity"],
+      "effect": { "workMultiplier": 1.5, "passiveCycles": 12 }
+    },
+    {
+      "id": "transistors",
+      "title": "TRANSISTORS",
+      "year": "1947",
+      "category": "Computing",
+      "description": "Install the foundational solid-state switch beneath the computing stack.",
+      "cost": 6000,
+      "requires": ["microchips"],
+      "effect": { "workMultiplier": 1.4, "deployMultiplier": 1.25 }
+    },
+    {
+      "id": "declaration",
+      "title": "DECLARATION OF INDEPENDENCE",
+      "year": "1776",
+      "category": "Governance",
+      "description": "Declare a new political system around liberty while leaving major contradictions unresolved.",
+      "cost": 8000,
+      "requires": ["transistors"],
+      "effect": { "deployMultiplier": 1.25 }
+    },
+    {
+      "id": "constitution",
+      "title": "CONSTITUTION.KERNEL",
+      "year": "1787",
+      "category": "Governance",
+      "description": "Define the federal kernel, separated powers, and amendment interface.",
+      "cost": 10500,
+      "requires": ["declaration"],
+      "effect": { "deployMultiplier": 1.3 }
+    },
+    {
+      "id": "bill-rights",
+      "title": "BILL OF RIGHTS",
+      "year": "1791",
+      "category": "Social",
+      "description": "Install explicit protections for speech, religion, due process, and more.",
+      "cost": 13000,
+      "requires": ["constitution"],
+      "effect": { "deployMultiplier": 1.2 }
+    },
+    {
+      "id": "erie-canal",
+      "title": "ERIE CANAL",
+      "year": "1825",
+      "category": "Infrastructure",
+      "description": "Link inland trade to Atlantic ports through a major water route.",
+      "cost": 16000,
+      "requires": ["transistors"],
+      "effect": { "workMultiplier": 1.2, "passiveCycles": 10 }
+    },
+    {
+      "id": "public-schools",
+      "title": "PUBLIC SCHOOL EXPANSION",
+      "year": "1800s",
+      "category": "Social",
+      "description": "Expand broad access to basic education, unevenly and imperfectly.",
+      "cost": 19000,
+      "requires": ["bill-rights"],
+      "effect": { "workMultiplier": 1.2, "deployMultiplier": 1.1 }
+    },
+    {
+      "id": "telegraph",
+      "title": "TELEGRAPH.EXE",
+      "year": "1844",
+      "category": "Invention",
+      "description": "Transmit information faster than physical transportation.",
+      "cost": 23000,
+      "requires": ["erie-canal"],
+      "effect": { "workMultiplier": 1.25, "passiveCycles": 14 }
+    },
+    {
+      "id": "abolition",
+      "title": "13TH AMENDMENT",
+      "year": "1865",
+      "category": "Social",
+      "description": "Abolish slavery in law after civil war; reconstruction remains unfinished.",
+      "cost": 28000,
+      "requires": ["public-schools"],
+      "effect": { "deployMultiplier": 1.35 }
+    },
+    {
+      "id": "telephone",
+      "title": "TELEPHONE",
+      "year": "1876",
+      "category": "Invention",
+      "description": "Create a real-time voice network across long distances.",
+      "cost": 34000,
+      "requires": ["telegraph"],
+      "effect": { "workMultiplier": 1.2, "passiveCycles": 18 }
+    },
+    {
+      "id": "national-parks",
+      "title": "NATIONAL PARKS",
+      "year": "1872",
+      "category": "Environment",
+      "description": "Protect extraordinary landscapes while confronting displacement in their creation.",
+      "cost": 40000,
+      "requires": ["abolition"],
+      "effect": { "deployMultiplier": 1.15 }
+    },
+    {
+      "id": "assembly-line",
+      "title": "ASSEMBLY LINE",
+      "year": "1913",
+      "category": "Industry",
+      "description": "Mass-produce complex goods with specialized sequential labor.",
+      "cost": 48000,
+      "requires": ["telephone"],
+      "effect": { "workMultiplier": 1.4, "passiveCycles": 24 }
+    },
+    {
+      "id": "suffrage",
+      "title": "WOMEN'S SUFFRAGE",
+      "year": "1920",
+      "category": "Social",
+      "description": "Ratify the 19th Amendment while discriminatory barriers persist.",
+      "cost": 57000,
+      "requires": ["national-parks"],
+      "effect": { "deployMultiplier": 1.3 }
+    },
+    {
+      "id": "radio",
+      "title": "RADIO",
+      "year": "1920s",
+      "category": "Invention",
+      "description": "Create a shared, instantaneous mass-media layer.",
+      "cost": 68000,
+      "requires": ["assembly-line"],
+      "effect": { "workMultiplier": 1.2, "passiveCycles": 30 }
+    },
+    {
+      "id": "new-deal",
+      "title": "NEW DEAL",
+      "year": "1930s",
+      "category": "Governance",
+      "description": "Deploy financial rules, public works, and a larger social safety system.",
+      "cost": 81000,
+      "requires": ["suffrage"],
+      "effect": { "deployMultiplier": 1.25, "passiveCycles": 18 }
+    },
+    {
+      "id": "penicillin",
+      "title": "MASS-PRODUCED PENICILLIN",
+      "year": "1940s",
+      "category": "Health",
+      "description": "Scale antibiotics and radically reduce deaths from bacterial infection.",
+      "cost": 96000,
+      "requires": ["radio"],
+      "effect": { "workMultiplier": 1.2, "deployMultiplier": 1.1 }
+    },
+    {
+      "id": "interstate",
+      "title": "INTERSTATE HIGHWAY SYSTEM",
+      "year": "1956",
+      "category": "Infrastructure",
+      "description": "Create a national high-speed road network with major urban side effects.",
+      "cost": 114000,
+      "requires": ["new-deal", "penicillin"],
+      "effect": { "workMultiplier": 1.3, "passiveCycles": 40 }
+    },
+    {
+      "id": "civil-rights",
+      "title": "CIVIL RIGHTS ACT",
+      "year": "1964",
+      "category": "Social",
+      "description": "Prohibit major forms of discrimination and strengthen federal enforcement.",
+      "cost": 136000,
+      "requires": ["interstate"],
+      "effect": { "deployMultiplier": 1.4 }
+    },
+    {
+      "id": "space-program",
+      "title": "SPACE PROGRAM",
+      "year": "1960s",
+      "category": "Science",
+      "description": "Coordinate science, engineering, and industry at national scale.",
+      "cost": 162000,
+      "requires": ["interstate"],
+      "effect": { "workMultiplier": 1.3, "passiveCycles": 50 }
+    },
+    {
+      "id": "arpanet",
+      "title": "ARPANET",
+      "year": "1969",
+      "category": "Computing",
+      "description": "Prototype resilient packet-switched computer networking.",
+      "cost": 194000,
+      "requires": ["space-program"],
+      "effect": { "workMultiplier": 1.25, "deployMultiplier": 1.15 }
+    },
+    {
+      "id": "moon",
+      "title": "MOON LANDING",
+      "year": "1969",
+      "category": "Science",
+      "description": "Land humans on the Moon and return them safely to Earth.",
+      "cost": 232000,
+      "requires": ["space-program", "civil-rights"],
+      "effect": { "workMultiplier": 1.3, "deployMultiplier": 1.15 }
+    },
+    {
+      "id": "epa",
+      "title": "ENVIRONMENTAL PROTECTION",
+      "year": "1970",
+      "category": "Environment",
+      "description": "Create federal systems for cleaner air, water, and environmental review.",
+      "cost": 278000,
+      "requires": ["civil-rights"],
+      "effect": { "deployMultiplier": 1.2 }
+    },
+    {
+      "id": "personal-computers",
+      "title": "PERSONAL COMPUTERS",
+      "year": "1970s–80s",
+      "category": "Computing",
+      "description": "Move programmable computing from institutions onto ordinary desks.",
+      "cost": 334000,
+      "requires": ["arpanet"],
+      "effect": { "workMultiplier": 1.45, "passiveCycles": 80 }
+    },
+    {
+      "id": "gps",
+      "title": "GPS",
+      "year": "1978–95",
+      "category": "Infrastructure",
+      "description": "Build satellite positioning into a global navigation utility.",
+      "cost": 400000,
+      "requires": ["moon"],
+      "effect": { "workMultiplier": 1.25, "deployMultiplier": 1.15 }
+    },
+    {
+      "id": "ada",
+      "title": "AMERICANS WITH DISABILITIES ACT",
+      "year": "1990",
+      "category": "Social",
+      "description": "Require broader access to employment, services, and public spaces.",
+      "cost": 480000,
+      "requires": ["epa"],
+      "effect": { "deployMultiplier": 1.3 }
+    },
+    {
+      "id": "web",
+      "title": "WORLD WIDE WEB",
+      "year": "1990s",
+      "category": "Computing",
+      "description": "Connect documents, people, and services through open web standards.",
+      "cost": 576000,
+      "requires": ["personal-computers"],
+      "effect": { "workMultiplier": 1.4, "passiveCycles": 120 }
+    },
+    {
+      "id": "cloud",
+      "title": "CLOUD COMPUTING",
+      "year": "2000s",
+      "category": "Computing",
+      "description": "Rent elastic computing infrastructure as a network service.",
+      "cost": 690000,
+      "requires": ["web"],
+      "effect": { "workMultiplier": 1.4, "passiveCycles": 180 }
+    },
+    {
+      "id": "smartphones",
+      "title": "SMARTPHONES",
+      "year": "2000s",
+      "category": "Computing",
+      "description": "Combine networked computers, cameras, sensors, and phones in a pocket.",
+      "cost": 828000,
+      "requires": ["web", "gps"],
+      "effect": { "workMultiplier": 1.3, "deployMultiplier": 1.2 }
+    },
+    {
+      "id": "renewables",
+      "title": "UTILITY-SCALE RENEWABLES",
+      "year": "2000s–20s",
+      "category": "Environment",
+      "description": "Scale wind, solar, storage, and lower-carbon grid technology.",
+      "cost": 994000,
+      "requires": ["ada", "cloud"],
+      "effect": { "workMultiplier": 1.2, "passiveCycles": 220 }
+    },
+    {
+      "id": "marriage-equality",
+      "title": "MARRIAGE EQUALITY",
+      "year": "2015",
+      "category": "Social",
+      "description": "Recognize same-sex marriage nationwide under constitutional law.",
+      "cost": 1193000,
+      "requires": ["ada", "smartphones"],
+      "effect": { "deployMultiplier": 1.3 }
+    },
+    {
+      "id": "mrna",
+      "title": "mRNA VACCINES",
+      "year": "2020",
+      "category": "Health",
+      "description": "Deploy decades of biomedical research as a rapid vaccine platform.",
+      "cost": 1432000,
+      "requires": ["renewables"],
+      "effect": { "workMultiplier": 1.25, "deployMultiplier": 1.2 }
+    },
+    {
+      "id": "modern-ai",
+      "title": "MODERN AI",
+      "year": "2020s",
+      "category": "Computing",
+      "description": "Scale machine learning into a general-purpose interface and production tool.",
+      "cost": 1718000,
+      "requires": ["marriage-equality", "mrna"],
+      "effect": { "workMultiplier": 1.5, "passiveCycles": 400 }
+    }
+  ]
+}

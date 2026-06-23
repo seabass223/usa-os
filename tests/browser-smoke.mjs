@@ -61,7 +61,14 @@ try {
         }
       };
 
-      click("#start-game");
+      const introInitiallyVisible =
+        !document.querySelector("#intro-screen").hidden;
+      click("#intro-start");
+      await new Promise((resolve) => setTimeout(resolve, 2450));
+      const introCompleted =
+        document.querySelector("#intro-screen").hidden &&
+        !document.querySelector("#game-screen").hidden &&
+        document.querySelector("#boot-screen").hidden;
       document.querySelector("#work-button").dispatchEvent(
         new PointerEvent("pointerdown", {
           bubbles: true,
@@ -137,6 +144,8 @@ try {
 
       return {
         gameVisible: !document.querySelector("#game-screen").hidden,
+        introInitiallyVisible,
+        introCompleted,
         fireworksTriggered,
         installedPlymouth: Boolean(
           [...document.querySelectorAll("#installed-nodes h3")].find((node) =>
@@ -159,6 +168,8 @@ try {
 
   for (const [name, passed] of Object.entries({
     gameVisible: result.gameVisible,
+    introInitiallyVisible: result.introInitiallyVisible,
+    introCompleted: result.introCompleted,
     fireworksTriggered: result.fireworksTriggered,
     installedPlymouth: result.installedPlymouth,
     nextNodeAvailable: result.nextNodeAvailable,
@@ -325,8 +336,11 @@ try {
   }
 } finally {
   edge.kill();
-  await wait(300);
-  await rm(profilePath, { recursive: true, force: true });
+  await Promise.race([
+    new Promise((resolveExit) => edge.once("exit", resolveExit)),
+    wait(1500),
+  ]);
+  await removeProfile();
 }
 
 async function waitForTarget() {
@@ -347,4 +361,16 @@ async function waitForTarget() {
 
 function wait(milliseconds) {
   return new Promise((resolveWait) => setTimeout(resolveWait, milliseconds));
+}
+
+async function removeProfile() {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      await rm(profilePath, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      if (error.code !== "EBUSY" && error.code !== "EPERM") throw error;
+      await wait(250);
+    }
+  }
 }

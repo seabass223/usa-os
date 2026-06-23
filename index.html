@@ -8,6 +8,22 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <section id="intro-screen" class="intro-screen" aria-label="USA-OS introduction">
+      <div class="intro-crt">
+        <p class="intro-kicker">UNITED SYSTEMS OF AMERICA</p>
+        <h1 class="intro-logo" aria-label="USA-OS">
+          <span>USA</span><span class="intro-dash">-</span><span>OS</span>
+        </h1>
+        <p class="intro-version">250TH ANNIVERSARY EDITION</p>
+        <div class="intro-stars" aria-hidden="true">★ ★ ★</div>
+        <button id="intro-start" class="nes-btn is-primary intro-start" type="button">
+          PRESS START
+        </button>
+        <p class="intro-copyright">© 1776–2026 USA-OS</p>
+      </div>
+      <audio id="intro-voice" src="./assets/audio/vo-usa-os.mp3" preload="auto"></audio>
+    </section>
+
     <header class="usa-header">
       <div>
         <p class="eyebrow">UNITED SYSTEMS OF AMERICA</p>
@@ -35,7 +51,7 @@
     </header>
 
     <main id="game">
-      <section id="boot-screen" class="nes-container is-dark with-title">
+      <section id="boot-screen" class="nes-container is-dark with-title" hidden>
         <p class="title">USA-OS BOOTLOADER</p>
         <h2>BOOT DEVICE USA-OS</h2>
         <pre>LOADING COLONY.KERNEL...
@@ -83,10 +99,22 @@ WAITING...</pre>
             <section class="nes-container is-dark with-title workspace-panel">
               <p class="title">USA-OS CONTROL CENTER</p>
               <nav class="workspace-tabs" aria-label="Game systems">
-                <button class="nes-btn is-primary active" type="button" data-tab="systems">SYSTEMS</button>
-                <button class="nes-btn" type="button" data-tab="policies">POLICIES</button>
-                <button class="nes-btn" type="button" data-tab="history">HISTORY</button>
-                <button class="nes-btn" type="button" data-tab="achievements">MEDALS</button>
+                <button class="nes-btn is-primary active" type="button" data-tab="systems">
+                  <img src="./assets/icons/tabs/systems.png" alt="" width="24" height="24" onerror="this.hidden=true">
+                  <span>SYSTEMS</span>
+                </button>
+                <button class="nes-btn" type="button" data-tab="policies">
+                  <img src="./assets/icons/tabs/policies.png" alt="" width="24" height="24" onerror="this.hidden=true">
+                  <span>POLICIES</span>
+                </button>
+                <button class="nes-btn" type="button" data-tab="history">
+                  <img src="./assets/icons/tabs/history.png" alt="" width="24" height="24" onerror="this.hidden=true">
+                  <span>HISTORY</span>
+                </button>
+                <button class="nes-btn" type="button" data-tab="achievements">
+                  <img src="./assets/icons/tabs/medals.png" alt="" width="24" height="24" onerror="this.hidden=true">
+                  <span>MEDALS</span>
+                </button>
               </nav>
 
               <div class="tab-panel active" data-panel="systems">

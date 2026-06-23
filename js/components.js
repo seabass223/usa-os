@@ -4,7 +4,7 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
 });
 
 const fullNumberFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 1,
+  maximumFractionDigits: 0,
 });
 
 export class StatusBar {

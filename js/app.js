@@ -15,6 +15,9 @@ import {
 
 const elements = Object.fromEntries(
   [
+    "intro-screen",
+    "intro-start",
+    "intro-voice",
     "boot-screen",
     "game-screen",
     "victory-screen",
@@ -51,12 +54,34 @@ try {
     initialSize: 2,
     volume: 0.85,
   });
+  const coinSounds = new SoundPool("./assets/audio/coin.mp3", {
+    initialSize: 6,
+    volume: 0.7,
+  });
   const patrioticFireworks = {
     colors: ["#d52b1e", "#ffffff", "#2878d0"],
     onBurst: () => popSounds.play(),
   };
   fireworks.attach(elements["work-button"], patrioticFireworks);
   fireworks.attach(elements["deploy-button"], patrioticFireworks);
+
+  const attachButtonImpact = (button) => {
+    button.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (event.button !== 0 || button.disabled) return;
+        button.classList.remove("button-impact");
+        void button.offsetWidth;
+        button.classList.add("button-impact");
+      },
+      { passive: true },
+    );
+    button.addEventListener("animationend", () =>
+      button.classList.remove("button-impact"),
+    );
+  };
+  attachButtonImpact(elements["work-button"]);
+  attachButtonImpact(elements["deploy-button"]);
   const components = [
     new StatusBar(document.querySelector("#status-bar")),
     new CoreControls(
@@ -72,16 +97,20 @@ try {
     new AssetMarket(
       document.querySelector("#asset-market"),
       document.querySelector("#buy-quantity"),
-      (id) => state.buyAsset(id),
+      (id) => {
+        if (state.buyAsset(id)) coinSounds.play();
+      },
       (quantity) => state.setBuyQuantity(quantity),
     ),
-    new PolicyPanel(document.querySelector("#policy-list"), (id) =>
-      state.buyPolicy(id),
-    ),
+    new PolicyPanel(document.querySelector("#policy-list"), (id) => {
+      if (state.buyPolicy(id)) coinSounds.play();
+    }),
     new SkillTree(
       document.querySelector("#available-nodes"),
       document.querySelector("#installed-nodes"),
-      (id) => state.install(id),
+      (id) => {
+        if (state.install(id)) coinSounds.play();
+      },
     ),
     new AchievementPanel(document.querySelector("#achievements")),
     new EventLog(document.querySelector("#event-log")),
@@ -156,6 +185,31 @@ try {
       // Playback remains optional if the browser or user blocks audio.
     });
   };
+
+  let introFinished = false;
+  const finishIntro = () => {
+    if (introFinished) return;
+    introFinished = true;
+    elements["intro-screen"].classList.add("intro-exit");
+    window.setTimeout(() => {
+      elements["intro-screen"].hidden = true;
+      if (state.hasSave()) {
+        startGame(true);
+      } else {
+        state.reset();
+        startGame();
+      }
+    }, 500);
+  };
+
+  elements["intro-start"].addEventListener("click", () => {
+    elements["intro-start"].disabled = true;
+    elements["intro-screen"].classList.add("intro-playing");
+    startMusic();
+    elements["intro-voice"].currentTime = 0;
+    elements["intro-voice"].play().catch(() => {});
+    window.setTimeout(finishIntro, 1900);
+  });
 
   elements["continue-game"].hidden = !state.hasSave();
   elements["start-game"].addEventListener("click", () => {

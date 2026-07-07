@@ -139,6 +139,17 @@ if (!state.isComplete) {
   );
 }
 
+if (state.totalProgress < 250000000) {
+  throw new Error(
+    `Late-era history is still too cheap; playthrough only shipped ${Math.round(state.totalProgress).toLocaleString()} progress.`,
+  );
+}
+
+const modernAiCost = state.nodeMap.get("modern-ai")?.cost ?? 0;
+if (modernAiCost < 30000000) {
+  throw new Error(`Modern AI unlock cost regressed to ${modernAiCost}.`);
+}
+
 state.save();
 const savedProgress = state.progress;
 const savedInstalled = state.installed.length;

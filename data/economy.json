@@ -6,7 +6,8 @@
     "offlineCapSeconds": 14400,
     "crisisThreshold": 100,
     "crisisProgressLoss": 0.04,
-    "assetShockMultiplier": 8
+    "assetShockMultiplier": 8,
+    "outputPressureScale": 0.35
   },
   "eras": [
     { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0, "image": "./assets/eras/era-0.png" },

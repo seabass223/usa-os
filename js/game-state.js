@@ -158,7 +158,8 @@ export class GameState extends EventTarget {
       instabilityPerSecond += (asset.instability ?? 0) * count;
     }
 
-    instabilityPerSecond *= instabilityMultiplier;
+    instabilityPerSecond *=
+      instabilityMultiplier * this.outputPressureMultiplier(cyclesPerSecond, deployPerSecond);
     return {
       workPerAction: this.economy.settings.baseWork * manualWorkMultiplier,
       deployPerAction: this.economy.settings.baseDeploy * manualDeployMultiplier,
@@ -180,6 +181,12 @@ export class GameState extends EventTarget {
       }
     }
     return multiplier;
+  }
+
+  outputPressureMultiplier(cyclesPerSecond, deployPerSecond) {
+    const scale = this.economy.settings.outputPressureScale ?? 0;
+    const throughput = Math.max(0, cyclesPerSecond) + Math.max(0, deployPerSecond);
+    return 1 + Math.log10(1 + throughput) * scale;
   }
 
   work(times = 1) {

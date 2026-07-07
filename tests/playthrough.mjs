@@ -30,8 +30,10 @@ const state = new GameState(progression, economy);
 
 let operations = 0;
 const operationLimit = 20000;
+let peakInstability = 0;
 
 while (!state.isComplete && operations < operationLimit) {
+  peakInstability = Math.max(peakInstability, state.instability);
   if (state.gameOver) {
     throw new Error(
       `Stability-aware playthrough ended at ${state.installed.length} milestones.`,
@@ -40,16 +42,21 @@ while (!state.isComplete && operations < operationLimit) {
 
   let acted = false;
 
-  for (const node of state.getAvailableNodes()) {
-    if (state.canInstall(node)) {
-      state.install(node.id);
-      acted = true;
-      break;
+  // Historical progress is now allowed only while the system has headroom. Asset
+  // purchases create immediate instability shocks, so this playthrough has to
+  // pace growth rather than buying its way to zero pressure in one burst.
+  if (state.instability < 70) {
+    for (const node of state.getAvailableNodes()) {
+      if (state.canInstall(node)) {
+        state.install(node.id);
+        acted = true;
+        break;
+      }
     }
   }
   if (acted) continue;
 
-  if (state.stats.netInstabilityPerSecond > 0) {
+  if (state.stats.netInstabilityPerSecond > 0 || state.instability > 30) {
     const institution = state
       .getUnlockedAssets("institutions")
       .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
@@ -63,28 +70,26 @@ while (!state.isComplete && operations < operationLimit) {
       state.buyAsset(institution.asset.id);
       continue;
     }
-    state.work(100);
-    state.deploy(100);
-    operations += 1;
-    continue;
   }
 
-  for (const category of ["innovation", "infrastructure", "institutions"]) {
-    const categoryOwned = state
-      .getUnlockedAssets(category)
-      .reduce((sum, asset) => sum + (state.assets[asset.id] ?? 0), 0);
-    const candidate = state
-      .getUnlockedAssets(category)
-      .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
-      .filter(
-        ({ purchase }) =>
-          purchase.cost <= state.progress * (categoryOwned === 0 ? 1 : 0.35),
-      )
-      .sort((a, b) => a.purchase.cost - b.purchase.cost)[0];
-    if (candidate) {
-      state.setBuyQuantity(1);
-      state.buyAsset(candidate.asset.id);
-      acted = true;
+  if (state.instability < 55) {
+    for (const category of ["innovation", "infrastructure", "institutions"]) {
+      const categoryOwned = state
+        .getUnlockedAssets(category)
+        .reduce((sum, asset) => sum + (state.assets[asset.id] ?? 0), 0);
+      const candidate = state
+        .getUnlockedAssets(category)
+        .map((asset) => ({ asset, purchase: state.getAssetCost(asset.id, 1) }))
+        .filter(
+          ({ purchase }) =>
+            purchase.cost <= state.progress * (categoryOwned === 0 ? 1 : 0.35),
+        )
+        .sort((a, b) => a.purchase.cost - b.purchase.cost)[0];
+      if (candidate) {
+        state.setBuyQuantity(1);
+        state.buyAsset(candidate.asset.id);
+        acted = true;
+      }
     }
   }
   if (acted) continue;
@@ -99,15 +104,24 @@ while (!state.isComplete && operations < operationLimit) {
 
   if (state.stats.cyclesPerSecond > 0 || state.stats.deployPerSecond > 0) {
     const pressure = Math.max(0, state.stats.netInstabilityPerSecond);
+    const targetInstability = state.instability > 55 ? 25 : 85;
     const safeSeconds =
-      pressure > 0 ? Math.max(0.1, (95 - state.instability) / pressure) : 10;
-    state.tick(Math.min(10, safeSeconds));
+      pressure > 0
+        ? Math.max(0.1, (targetInstability - state.instability) / pressure)
+        : 10;
+    state.tick(Math.min(10, Math.max(0.1, safeSeconds)));
     if (state.cycles > 0 && state.stats.deployPerSecond === 0) state.deploy(10);
   } else {
     state.work(10);
     state.deploy(10);
   }
   operations += 1;
+}
+
+if (peakInstability < 50) {
+  throw new Error(
+    `Instability balancing is too passive; peak only reached ${peakInstability.toFixed(1)}%.`,
+  );
 }
 
 if (!state.isComplete) {
@@ -119,6 +133,7 @@ if (!state.isComplete) {
         progress: state.progress,
         cyclesPerSecond: state.stats.cyclesPerSecond,
         deployPerSecond: state.stats.deployPerSecond,
+        instability: state.instability,
         assets: state.assets,
       }),
   );
@@ -165,6 +180,7 @@ console.log(
       crises: state.crises,
       gameOverTest: failureState.gameOver,
       operations,
+      peakInstability: Math.round(peakInstability),
       totalProgress: Math.round(state.totalProgress),
     },
     null,

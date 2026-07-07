@@ -58,10 +58,7 @@ export class GameState extends EventTarget {
     this.totalProgress += deployed;
 
     const instabilityDelta = stats.netInstabilityPerSecond * seconds;
-    this.instability = clamp(this.instability + instabilityDelta, 0, 100);
-    if (this.instability >= this.economy.settings.crisisThreshold) {
-      this.endGame();
-    }
+    this.addInstability(instabilityDelta);
 
     this.checkAchievements();
     if (notify) this.changed(false);
@@ -255,10 +252,28 @@ export class GameState extends EventTarget {
     this.assets[id] = (this.assets[id] ?? 0) + quantity;
     const asset = this.assetMap.get(id);
     this.log.unshift(`ACQUIRED ${quantity} × ${asset.title}.`);
+    this.applyAssetShock(asset, quantity);
     this.trimLog();
     this.checkAchievements();
     this.changed();
     return true;
+  }
+
+  applyAssetShock(asset, quantity) {
+    if (!asset?.instability || quantity <= 0) return;
+    const multiplier = this.economy.settings.assetShockMultiplier ?? 0;
+    const shock = asset.instability * quantity * multiplier;
+    this.addInstability(shock);
+    if (shock >= 1) {
+      this.log.unshift(`RAPID GROWTH SHOCK: +${shock.toFixed(1)} instability.`);
+    }
+  }
+
+  addInstability(delta) {
+    this.instability = clamp(this.instability + delta, 0, 100);
+    if (this.instability >= this.economy.settings.crisisThreshold) {
+      this.endGame();
+    }
   }
 
   getAvailablePolicies() {

@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const storageAccount = "kylephoto";
 const container = "summer-into-ai";
-const virtualDir = "usa-os";
+const virtualDir = readOption("--dir") ?? process.env.USA_OS_DEPLOY_DIR ?? "usa-os";
 const distPath = join(process.cwd(), "dist");
 const dryRun = process.argv.includes("--dry-run");
 const azureCli = process.platform === "win32" ? "az.cmd" : "az";
@@ -113,4 +113,12 @@ function formatCommand(command, args) {
 function quoteArgument(value) {
   if (!/\s/.test(value)) return value;
   return `"${value.replaceAll('"', '\\"')}"`;
+}
+
+function readOption(name) {
+  const inline = process.argv.find((arg) => arg.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
+  const index = process.argv.indexOf(name);
+  if (index === -1) return null;
+  return process.argv[index + 1] ?? null;
 }

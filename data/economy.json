@@ -7,7 +7,9 @@
     "crisisThreshold": 100,
     "crisisProgressLoss": 0.04,
     "assetShockMultiplier": 8,
-    "outputPressureScale": 0.35
+    "assetShockEraScale": [0.45, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3],
+    "outputPressureScale": 0.28,
+    "outputPressureEraScale": [0.45, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3]
   },
   "eras": [
     { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0, "image": "./assets/eras/era-0.png" },

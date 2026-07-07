@@ -185,8 +185,14 @@ export class GameState extends EventTarget {
 
   outputPressureMultiplier(cyclesPerSecond, deployPerSecond) {
     const scale = this.economy.settings.outputPressureScale ?? 0;
+    const eraScale = this.eraPressureScale("outputPressureEraScale");
     const throughput = Math.max(0, cyclesPerSecond) + Math.max(0, deployPerSecond);
-    return 1 + Math.log10(1 + throughput) * scale;
+    return 1 + Math.log10(1 + throughput) * scale * eraScale;
+  }
+
+  eraPressureScale(settingName) {
+    const scale = this.economy.settings[settingName];
+    return Array.isArray(scale) ? (scale[this.era.id] ?? 1) : 1;
   }
 
   work(times = 1) {
@@ -269,7 +275,7 @@ export class GameState extends EventTarget {
   applyAssetShock(asset, quantity) {
     if (!asset?.instability || quantity <= 0) return;
     const multiplier = this.economy.settings.assetShockMultiplier ?? 0;
-    const shock = asset.instability * quantity * multiplier;
+    const shock = asset.instability * quantity * multiplier * this.eraPressureScale("assetShockEraScale");
     this.addInstability(shock);
     if (shock >= 1) {
       this.log.unshift(`RAPID GROWTH SHOCK: +${shock.toFixed(1)} instability.`);

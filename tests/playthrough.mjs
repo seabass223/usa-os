@@ -166,6 +166,20 @@ if (!policyState.achievements.includes("full-policy-stack")) {
   throw new Error("Full policy stack achievement did not unlock.");
 }
 
+const earlyShockState = new GameState(progression, economy);
+earlyShockState.progress = 1000;
+earlyShockState.buyAsset("workshop");
+const earlyShock = earlyShockState.instability;
+const lateShockState = new GameState(progression, economy);
+lateShockState.setDebugEra(8);
+lateShockState.progress = 1000;
+lateShockState.buyAsset("workshop");
+if (earlyShock >= 1 || lateShockState.instability < earlyShock * 5) {
+  throw new Error(
+    `Era instability scaling is not easing early game while hardening late game: early=${earlyShock}, late=${lateShockState.instability}`,
+  );
+}
+
 const failureState = new GameState(progression, economy);
 failureState.progress = 1000;
 failureState.setBuyQuantity(1);
@@ -188,6 +202,8 @@ console.log(
       policies: state.policies.length,
       achievements: state.achievements.length,
       policyAchievementTest: policyState.achievements.includes("full-policy-stack"),
+      earlyShock: Number(earlyShock.toFixed(2)),
+      lateShock: Number(lateShockState.instability.toFixed(2)),
       crises: state.crises,
       gameOverTest: failureState.gameOver,
       operations,

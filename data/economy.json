@@ -70,6 +70,11 @@
     { "id": "million", "title": "MILLION-CYCLE MACHINE", "metric": "totalCycles", "threshold": 1000000 },
     { "id": "stable", "title": "INSTITUTIONS MATTER", "metric": "institutionsOwned", "threshold": 25 },
     { "id": "historian", "title": "PATCH HISTORIAN", "metric": "milestones", "threshold": 20 },
+    { "id": "ten-million-cycles", "title": "TEN-MILLION CYCLE CORE", "metric": "totalCycles", "threshold": 10000000 },
+    { "id": "asset-century", "title": "ASSET CENTURY", "metric": "assetsOwned", "threshold": 100 },
+    { "id": "ten-million-progress", "title": "TEN-MILLION SHIPPED", "metric": "totalProgress", "threshold": 10000000 },
+    { "id": "fifty-million-cycles", "title": "HYPERSCALE NATION", "metric": "totalCycles", "threshold": 50000000 },
+    { "id": "full-policy-stack", "title": "FULL POLICY STACK", "metric": "policiesInstalled", "threshold": 10 },
     { "id": "present", "title": "PRESENT DAY BUILD", "metric": "milestones", "threshold": 40 }
   ]
 }

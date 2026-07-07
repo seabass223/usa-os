@@ -66,6 +66,7 @@ node scripts/deploy-azure.mjs --dir usa-os-staging
 - Buy repeatable Innovation, Infrastructure, and Institution assets.
 - Install one-time Policy patches.
 - Spend progress on historical packages to unlock new eras.
+- Keep building after the basics to unlock long-game achievements.
 
 Innovation produces cycles automatically. Infrastructure deploys cycles
 automatically. Growth assets also create immediate instability shocks when

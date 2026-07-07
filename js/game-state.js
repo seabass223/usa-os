@@ -304,6 +304,7 @@ export class GameState extends EventTarget {
     this.progress -= policy.cost;
     this.policies.push(id);
     this.log.unshift(`POLICY INSTALLED: ${policy.title}.`);
+    this.checkAchievements();
     this.trimLog();
     this.changed();
     return true;
@@ -372,6 +373,7 @@ export class GameState extends EventTarget {
       institutionsOwned: this.economy.assets
         .filter((asset) => asset.category === "institutions")
         .reduce((sum, asset) => sum + (this.assets[asset.id] ?? 0), 0),
+      policiesInstalled: this.policies.length,
       milestones: this.installed.length,
     };
     return values[name] ?? 0;

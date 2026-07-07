@@ -156,6 +156,16 @@ if (
   throw new Error("Saved game did not restore the expected state.");
 }
 
+const policyState = new GameState(progression, economy);
+policyState.installed = progression.nodes.map((node) => node.id);
+policyState.progress = 10000000000;
+for (const policy of economy.policies) {
+  policyState.buyPolicy(policy.id);
+}
+if (!policyState.achievements.includes("full-policy-stack")) {
+  throw new Error("Full policy stack achievement did not unlock.");
+}
+
 const failureState = new GameState(progression, economy);
 failureState.progress = 1000;
 failureState.setBuyQuantity(1);
@@ -177,6 +187,7 @@ console.log(
       assets: state.metric("assetsOwned"),
       policies: state.policies.length,
       achievements: state.achievements.length,
+      policyAchievementTest: policyState.achievements.includes("full-policy-stack"),
       crises: state.crises,
       gameOverTest: failureState.gameOver,
       operations,

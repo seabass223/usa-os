@@ -243,6 +243,38 @@ try {
     if (!passed) throw new Error(`Game-over assertion failed: ${name}`);
   }
 
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1368,
+    height: 912,
+    deviceScaleFactor: 2,
+    mobile: false,
+  });
+  await send("Emulation.setTouchEmulationEnabled", {
+    enabled: true,
+    maxTouchPoints: 10,
+  });
+  const largeTouchScreen = await evaluate(`
+    (() => ({
+      mobileNoticeHidden:
+        getComputedStyle(document.querySelector(".mobile-device-message")).display === "none",
+      gameAccessible:
+        getComputedStyle(document.querySelector("#game")).display !== "none",
+    }))()
+  `);
+  for (const [name, passed] of Object.entries({
+    largeTouchNoticeHidden: largeTouchScreen.mobileNoticeHidden,
+    largeTouchGameAccessible: largeTouchScreen.gameAccessible,
+  })) {
+    if (!passed) throw new Error(`Large touch screen assertion failed: ${name}`);
+  }
+  await send("Emulation.setTouchEmulationEnabled", { enabled: false });
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1600,
+    height: 1000,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+
   if (process.argv.includes("--screenshot")) {
     await send("Emulation.setDeviceMetricsOverride", {
       width: 1600,

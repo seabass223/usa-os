@@ -1421,7 +1421,7 @@ pre {
   }
 }
 
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+@media (max-width: 900px) {
   body {
     min-height: 100vh;
     padding: 0;

@@ -127,6 +127,11 @@ try {
       fireworks.celebrationTimers.clear();
       document.body.classList.remove("era-change-shake");
       document.querySelectorAll(".eagle-flyover").forEach((element) => element.remove());
+    } else if (!elements["game-screen"].hidden && !state.gameOver) {
+      elements["background-music"].volume = 0.45;
+      elements["background-music"].play().catch(() => {
+        // Playback remains optional if the browser or user blocks audio.
+      });
     }
   };
   setBossMode(localStorage.getItem("usa-os-boss-mode") === "1");

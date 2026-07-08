@@ -63,6 +63,14 @@ try {
 
       const introInitiallyVisible =
         !document.querySelector("#intro-screen").hidden;
+      const backgroundMusic = document.querySelector("#background-music");
+      backgroundMusic.dataset.playCount = "0";
+      backgroundMusic.play = () => {
+        backgroundMusic.dataset.playCount = String(
+          Number(backgroundMusic.dataset.playCount || "0") + 1,
+        );
+        return Promise.resolve();
+      };
       const bossButton = document.querySelector("#boss-mode-toggle");
       bossButton.click();
       const bossModeEnabled =
@@ -88,6 +96,14 @@ try {
         document.querySelector("#intro-screen").hidden &&
         !document.querySelector("#game-screen").hidden &&
         document.querySelector("#boot-screen").hidden;
+      const playCountBeforeBossExit = Number(backgroundMusic.dataset.playCount || "0");
+      bossButton.click();
+      bossButton.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const bossExitRestartedMusic =
+        !document.body.classList.contains("boss-mode") &&
+        !backgroundMusic.muted &&
+        Number(backgroundMusic.dataset.playCount || "0") > playCountBeforeBossExit;
       document.querySelector("#work-button").dispatchEvent(
         new PointerEvent("pointerdown", {
           bubbles: true,
@@ -184,6 +200,7 @@ try {
         introInitiallyVisible,
         bossModeEnabled,
         bossModeDisabled,
+        bossExitRestartedMusic,
         helpOpened,
         helpClosed,
         introCompleted,
@@ -215,6 +232,7 @@ try {
     introInitiallyVisible: result.introInitiallyVisible,
     bossModeEnabled: result.bossModeEnabled,
     bossModeDisabled: result.bossModeDisabled,
+    bossExitRestartedMusic: result.bossExitRestartedMusic,
     helpOpened: result.helpOpened,
     helpClosed: result.helpClosed,
     introCompleted: result.introCompleted,

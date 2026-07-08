@@ -545,6 +545,158 @@ main {
   text-align: right;
 }
 
+.boss-mode-button {
+  min-width: 120px;
+  padding: 4px 8px;
+  color: white !important;
+  font-size: 0.58rem;
+  line-height: 1.1;
+  background: #217346 !important;
+}
+
+body.boss-mode {
+  min-height: 100vh;
+  color: #000;
+  background:
+    linear-gradient(#d9e8fb 0 31px, #c7ddf7 31px 32px),
+    linear-gradient(90deg, #eef5ff 0 119px, #d6e5f7 119px 120px),
+    #f7f7f7;
+  background-size: 100% 32px, 120px 100%, auto;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+body.boss-mode,
+body.boss-mode * {
+  animation: none !important;
+  transition: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  image-rendering: auto !important;
+  border-radius: 0 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+body.boss-mode::before,
+body.boss-mode .flag-ripple,
+body.boss-mode .fireworks-canvas,
+body.boss-mode .eagle-flyover,
+body.boss-mode .intro-stars,
+body.boss-mode .era-image-frame {
+  display: none !important;
+}
+
+body.boss-mode .intro-screen {
+  color: #000;
+  background: #f3f3f3;
+}
+
+body.boss-mode .intro-crt,
+body.boss-mode .nes-container,
+body.boss-mode .nes-dialog,
+body.boss-mode .telemetry-card,
+body.boss-mode .hero-card,
+body.boss-mode .asset-card,
+body.boss-mode .node-card,
+body.boss-mode .policy-card,
+body.boss-mode .market-column,
+body.boss-mode #boot-screen,
+body.boss-mode #victory-screen,
+body.boss-mode #game-over-screen {
+  color: #000 !important;
+  background: #fff !important;
+  border: 1px solid #9e9e9e !important;
+}
+
+body.boss-mode .usa-header {
+  align-items: center;
+  margin-bottom: 10px;
+  color: #000;
+  background: #eee;
+  border: 1px solid #aaa;
+}
+
+body.boss-mode .usa-header h1 {
+  color: #1f4e79;
+  font-size: 1.6rem;
+  letter-spacing: 0;
+}
+
+body.boss-mode .eyebrow::after {
+  content: " / Q3 Operating Model.xlsx";
+}
+
+body.boss-mode .eyebrow,
+body.boss-mode .header-version,
+body.boss-mode .title,
+body.boss-mode h1,
+body.boss-mode h2,
+body.boss-mode h3,
+body.boss-mode h4,
+body.boss-mode small,
+body.boss-mode p,
+body.boss-mode span,
+body.boss-mode li {
+  color: #000 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+body.boss-mode .desktop-shell,
+body.boss-mode .primary-metric-row,
+body.boss-mode .left-telemetry-row,
+body.boss-mode .two-column,
+body.boss-mode .asset-grid,
+body.boss-mode .policy-grid,
+body.boss-mode .node-grid,
+body.boss-mode .status-dashboard {
+  gap: 0;
+}
+
+body.boss-mode .hero-card,
+body.boss-mode .telemetry-card,
+body.boss-mode .era-progress-panel,
+body.boss-mode .market-column,
+body.boss-mode .asset-card,
+body.boss-mode .policy-card,
+body.boss-mode .node-card {
+  border-collapse: collapse;
+  border-color: #b7b7b7 !important;
+}
+
+body.boss-mode .hero-card,
+body.boss-mode .telemetry-card,
+body.boss-mode .asset-card,
+body.boss-mode .policy-card,
+body.boss-mode .node-card,
+body.boss-mode #event-log li {
+  background:
+    linear-gradient(#fff 0 31px, #d9e2f3 31px 32px),
+    linear-gradient(90deg, transparent 0 139px, #d9e2f3 139px 140px),
+    #fff !important;
+  background-size: 100% 32px, 140px 100%, auto !important;
+}
+
+body.boss-mode button,
+body.boss-mode .nes-btn {
+  color: #000 !important;
+  background: #e6e6e6 !important;
+  border: 1px solid #7f7f7f !important;
+  font-size: 0.78rem;
+}
+
+body.boss-mode .boss-mode-button {
+  color: #fff !important;
+  background: #217346 !important;
+  border-color: #145a32 !important;
+}
+
+body.boss-mode progress,
+body.boss-mode .nes-progress {
+  height: 14px !important;
+  background: #fff !important;
+  border: 1px solid #999 !important;
+}
+
 .help-modal {
   width: min(880px, calc(100vw - 28px));
   max-height: min(760px, calc(100vh - 28px));

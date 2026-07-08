@@ -22,6 +22,7 @@ const elements = Object.fromEntries(
     "preload-progress",
     "intro-voice",
     "help-open",
+    "boss-mode-toggle",
     "help-modal",
     "help-close",
     "boot-screen",
@@ -78,6 +79,7 @@ try {
     initialSize: 3,
     volume: 0.9,
   });
+  const soundPools = [popSounds, eraUnlockSound, coinSounds, eagleSounds];
   const patrioticFireworks = {
     colors: ["#d52b1e", "#ffffff", "#2878d0"],
     onBurst: () => popSounds.play(),
@@ -107,6 +109,30 @@ try {
   attachButtonImpact(elements["deploy-button"]);
   attachButtonImpact(elements["save-button"]);
   attachButtonImpact(elements["help-open"]);
+  attachButtonImpact(elements["boss-mode-toggle"]);
+
+  const setBossMode = (enabled) => {
+    document.body.classList.toggle("boss-mode", enabled);
+    elements["boss-mode-toggle"].setAttribute("aria-pressed", String(enabled));
+    elements["boss-mode-toggle"].textContent = enabled ? "EXIT BOSS" : "BOSS MODE";
+    localStorage.setItem("usa-os-boss-mode", enabled ? "1" : "0");
+    for (const audio of [elements["background-music"], elements["intro-voice"]]) {
+      audio.muted = enabled;
+      if (enabled) audio.pause();
+    }
+    for (const pool of soundPools) pool.setMuted(enabled);
+    if (enabled) {
+      fireworks.particles.length = 0;
+      for (const timer of fireworks.celebrationTimers) window.clearTimeout(timer);
+      fireworks.celebrationTimers.clear();
+      document.body.classList.remove("era-change-shake");
+      document.querySelectorAll(".eagle-flyover").forEach((element) => element.remove());
+    }
+  };
+  setBossMode(localStorage.getItem("usa-os-boss-mode") === "1");
+  elements["boss-mode-toggle"].addEventListener("click", () => {
+    setBossMode(!document.body.classList.contains("boss-mode"));
+  });
 
   elements["help-open"].addEventListener("click", () => {
     elements["help-modal"].showModal();
@@ -118,6 +144,7 @@ try {
   });
 
   const launchEagle = (message) => {
+    if (document.body.classList.contains("boss-mode")) return;
     eagleSounds.play();
 
     const flyover = document.createElement("div");
@@ -217,6 +244,7 @@ try {
   let shakeTimer = null;
 
   const celebrateEraChange = () => {
+    if (document.body.classList.contains("boss-mode")) return;
     eraUnlockSound.play();
     fireworks.celebrateFullscreen({
       bursts: 16,
@@ -287,6 +315,7 @@ try {
   const startMusic = () => {
     musicStoppedForGameOver = false;
     elements["background-music"].volume = 0.45;
+    if (document.body.classList.contains("boss-mode")) return;
     elements["background-music"].play().catch(() => {
       // Playback remains optional if the browser or user blocks audio.
     });
@@ -320,7 +349,9 @@ try {
     elements["intro-screen"].classList.add("intro-playing");
     startMusic();
     elements["intro-voice"].currentTime = 0;
-    elements["intro-voice"].play().catch(() => {});
+    if (!document.body.classList.contains("boss-mode")) {
+      elements["intro-voice"].play().catch(() => {});
+    }
     window.setTimeout(finishIntro, 1900);
   });
 

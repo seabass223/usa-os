@@ -63,6 +63,18 @@ try {
 
       const introInitiallyVisible =
         !document.querySelector("#intro-screen").hidden;
+      const bossButton = document.querySelector("#boss-mode-toggle");
+      bossButton.click();
+      const bossModeEnabled =
+        document.body.classList.contains("boss-mode") &&
+        bossButton.getAttribute("aria-pressed") === "true" &&
+        document.querySelector("#background-music").muted &&
+        getComputedStyle(document.body).fontFamily.includes("Arial") &&
+        getComputedStyle(document.querySelector(".usa-header")).backgroundColor === "rgb(238, 238, 238)";
+      bossButton.click();
+      const bossModeDisabled =
+        !document.body.classList.contains("boss-mode") &&
+        bossButton.getAttribute("aria-pressed") === "false";
       document.querySelector("#help-open").click();
       const helpOpened =
         document.querySelector("#help-modal").open &&
@@ -170,6 +182,8 @@ try {
       return {
         gameVisible: !document.querySelector("#game-screen").hidden,
         introInitiallyVisible,
+        bossModeEnabled,
+        bossModeDisabled,
         helpOpened,
         helpClosed,
         introCompleted,
@@ -199,6 +213,8 @@ try {
   for (const [name, passed] of Object.entries({
     gameVisible: result.gameVisible,
     introInitiallyVisible: result.introInitiallyVisible,
+    bossModeEnabled: result.bossModeEnabled,
+    bossModeDisabled: result.bossModeDisabled,
     helpOpened: result.helpOpened,
     helpClosed: result.helpClosed,
     introCompleted: result.introCompleted,

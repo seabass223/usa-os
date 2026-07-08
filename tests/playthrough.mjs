@@ -150,6 +150,35 @@ if (modernAiCost < 30000000) {
   throw new Error(`Modern AI unlock cost regressed to ${modernAiCost}.`);
 }
 
+const noInstitutionState = new GameState(progression, economy);
+const withInstitutionState = new GameState(progression, economy);
+withInstitutionState.progress = 100000;
+withInstitutionState.setBuyQuantity(5);
+withInstitutionState.buyAsset("town-council");
+const radioNode = withInstitutionState.nodeMap.get("radio");
+const undiscountedRadioCost = noInstitutionState.getNodeCost(radioNode);
+const discountedRadioCost = withInstitutionState.getNodeCost(radioNode);
+if (!(discountedRadioCost < undiscountedRadioCost)) {
+  throw new Error(
+    `Institutions did not reduce History install cost: ${discountedRadioCost} >= ${undiscountedRadioCost}`,
+  );
+}
+if (!(withInstitutionState.stats.civicCapacityPerSecond > 0)) {
+  throw new Error("Institutions did not create Civic Capacity.");
+}
+
+const heavyInstitutionState = new GameState(progression, economy);
+heavyInstitutionState.setDebugEra(8);
+heavyInstitutionState.progress = 1000000000000;
+heavyInstitutionState.setBuyQuantity(100);
+heavyInstitutionState.buyAsset("resilience-office");
+if (
+  heavyInstitutionState.stats.historyCostMultiplier <
+  economy.settings.minimumHistoryCostMultiplier
+) {
+  throw new Error("Civic Capacity History discount exceeded its cap.");
+}
+
 state.save();
 const savedProgress = state.progress;
 const savedInstalled = state.installed.length;
@@ -177,6 +206,7 @@ if (!policyState.achievements.includes("full-policy-stack")) {
   throw new Error("Full policy stack achievement did not unlock.");
 }
 
+localStorage.removeItem("usa-os-debug-era");
 const earlyShockState = new GameState(progression, economy);
 earlyShockState.progress = 1000;
 earlyShockState.buyAsset("workshop");

@@ -160,6 +160,8 @@ export class GameState extends EventTarget {
 
     instabilityPerSecond *=
       instabilityMultiplier * this.outputPressureMultiplier(cyclesPerSecond, deployPerSecond);
+    const civicCapacityPerSecond = stabilityPerSecond;
+    const historyCostMultiplier = this.historyCostMultiplier(civicCapacityPerSecond);
     return {
       workPerAction: this.economy.settings.baseWork * manualWorkMultiplier,
       deployPerAction: this.economy.settings.baseDeploy * manualDeployMultiplier,
@@ -167,6 +169,8 @@ export class GameState extends EventTarget {
       deployPerSecond,
       instabilityPerSecond,
       stabilityPerSecond,
+      civicCapacityPerSecond,
+      historyCostMultiplier,
       netInstabilityPerSecond: instabilityPerSecond - stabilityPerSecond,
     };
   }
@@ -188,6 +192,13 @@ export class GameState extends EventTarget {
     const eraScale = this.eraPressureScale("outputPressureEraScale");
     const throughput = Math.max(0, cyclesPerSecond) + Math.max(0, deployPerSecond);
     return 1 + Math.log10(1 + throughput) * scale * eraScale;
+  }
+
+  historyCostMultiplier(civicCapacityPerSecond) {
+    const scale = this.economy.settings.historyDiscountScale ?? 0;
+    const minimum = this.economy.settings.minimumHistoryCostMultiplier ?? 1;
+    const multiplier = 1 / (1 + Math.log10(1 + Math.max(0, civicCapacityPerSecond)) * scale);
+    return clamp(multiplier, minimum, 1);
   }
 
   eraPressureScale(settingName) {
@@ -326,8 +337,14 @@ export class GameState extends EventTarget {
   canInstall(node) {
     return (
       this.getAvailableNodes().some((candidate) => candidate.id === node.id) &&
-      this.progress >= node.cost
+      this.progress >= this.getNodeCost(node)
     );
+  }
+
+  getNodeCost(nodeOrId) {
+    const node = typeof nodeOrId === "string" ? this.nodeMap.get(nodeOrId) : nodeOrId;
+    if (!node) return Infinity;
+    return node.cost * this.stats.historyCostMultiplier;
   }
 
   install(id) {
@@ -335,7 +352,7 @@ export class GameState extends EventTarget {
     const node = this.nodeMap.get(id);
     if (!node || !this.canInstall(node)) return false;
     const oldEra = this.era.id;
-    this.progress -= node.cost;
+    this.progress -= this.getNodeCost(node);
     this.installed.push(node.id);
     this.log.unshift(`HISTORY PATCH: ${node.title}.`);
     if (this.era.id > oldEra) {

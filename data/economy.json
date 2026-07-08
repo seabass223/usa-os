@@ -9,7 +9,9 @@
     "assetShockMultiplier": 8,
     "assetShockEraScale": [0.45, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3],
     "outputPressureScale": 0.28,
-    "outputPressureEraScale": [0.45, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3]
+    "outputPressureEraScale": [0.45, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3],
+    "historyDiscountScale": 0.06,
+    "minimumHistoryCostMultiplier": 0.78
   },
   "eras": [
     { "id": 0, "title": "COLONIAL BOOT", "requiredMilestones": 0, "image": "./assets/eras/era-0.png" },

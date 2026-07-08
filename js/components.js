@@ -248,14 +248,17 @@ export class SkillTree {
   }
 
   availableCard(node, state) {
-    const affordable = state.progress >= node.cost;
+    const effectiveCost = state.getNodeCost(node);
+    const discountPercent = Math.round((1 - state.stats.historyCostMultiplier) * 100);
+    const affordable = state.progress >= effectiveCost;
     return `
       <article class="nes-container is-rounded is-dark node-card ${affordable ? "affordable" : ""}">
         <h3>${escapeHtml(node.title)}</h3>
         <p>${escapeHtml(node.description)}</p>
         <p class="node-meta">${escapeHtml(node.year)} · ${escapeHtml(node.category)}</p>
+        ${discountPercent > 0 ? `<p class="node-meta">CIVIC CAPACITY DISCOUNT: ${discountPercent}%</p>` : ""}
         <button class="nes-btn is-primary" data-install="${node.id}" ${affordable ? "" : "disabled"}>
-          ADVANCE HISTORY — ${format(node.cost)}
+          ADVANCE HISTORY — ${format(effectiveCost)}
         </button>
       </article>
     `;
@@ -324,7 +327,7 @@ function assetCard(asset, state) {
     ? `${format(asset.cyclesPerSecond * state.assetMultiplier(asset))} cycles/sec each`
     : asset.deployPerSecond
       ? `${format(asset.deployPerSecond * state.assetMultiplier(asset))} deploy/sec each`
-      : `${format(asset.stabilityPerSecond * state.assetMultiplier(asset))} stability/sec each`;
+      : `${format(asset.stabilityPerSecond * state.assetMultiplier(asset))} stability + civic/sec each`;
   return `
     <article class="nes-container is-rounded is-dark asset-card ${affordable ? "affordable" : ""}">
       <div>
@@ -352,7 +355,7 @@ function categoryHelp(category) {
   return {
     innovation: "Produces CPU cycles automatically.",
     infrastructure: "Converts stored cycles into progress automatically.",
-    institutions: "Reduces instability and prevents expensive crises.",
+    institutions: "Reduces instability and builds Civic Capacity for cheaper History installs.",
   }[category];
 }
 

@@ -3,6 +3,10 @@ const BEAR_SPRITES = {
   attacking: "./assets/images/bear-attack.png",
   hit: "./assets/images/bear-hit.png",
 };
+const BEAR_MAX_HEALTH = 700;
+const STARTING_AMMO = 120;
+const FIREWORK_DAMAGE = 7;
+const BEAR_ATTACK_DAMAGE = 30;
 
 export class EndBossBattle {
   constructor({ overlay, state, fireworks, popSounds }) {
@@ -47,8 +51,8 @@ export class EndBossBattle {
       active: true,
       concluded: false,
       life: 100,
-      ammo: clamp(Math.round(18 + Math.log10(1 + production) * 8), 18, 80),
-      bearHealth: 100,
+      ammo: STARTING_AMMO,
+      bearHealth: BEAR_MAX_HEALTH,
       attacking: false,
       defended: false,
     };
@@ -76,7 +80,7 @@ export class EndBossBattle {
       return;
     }
     this.state.ammo -= 1;
-    this.state.bearHealth = Math.max(0, this.state.bearHealth - 12);
+    this.state.bearHealth = Math.max(0, this.state.bearHealth - FIREWORK_DAMAGE);
     this.state.defended = false;
     this.popSounds?.play();
     this.spawnShot(event.clientX, event.clientY);
@@ -103,7 +107,7 @@ export class EndBossBattle {
     this.attackWindow = window.setTimeout(() => {
       if (!this.state.active || this.state.concluded) return;
       if (!this.state.defended) {
-        this.state.life = Math.max(0, this.state.life - 35);
+        this.state.life = Math.max(0, this.state.life - BEAR_ATTACK_DAMAGE);
         this.refs.result.textContent = "Defense missed. Life systems took a massive hit.";
       }
       this.state.attacking = false;
@@ -181,8 +185,8 @@ export class EndBossBattle {
     this.refs.ammo.textContent = `AMMO ${Math.round(this.state.ammo)}`;
     this.refs.health.textContent = `BEAR ${Math.round(this.state.bearHealth)}`;
     this.refs.life.style.setProperty("--meter", `${this.state.life}%`);
-    this.refs.ammo.style.setProperty("--meter", `${clamp(this.state.ammo, 0, 100)}%`);
-    this.refs.health.style.setProperty("--meter", `${this.state.bearHealth}%`);
+    this.refs.ammo.style.setProperty("--meter", `${(this.state.ammo / STARTING_AMMO) * 100}%`);
+    this.refs.health.style.setProperty("--meter", `${(this.state.bearHealth / BEAR_MAX_HEALTH) * 100}%`);
   }
 }
 

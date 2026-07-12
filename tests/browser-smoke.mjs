@@ -67,7 +67,9 @@ try {
         document.body.textContent.includes("A NEW PLAYER HAS ENTERED THE SIMULATION") &&
         document.querySelector("#boss-life-meter") &&
         document.querySelector("#boss-ammo-meter") &&
-        document.querySelector(".bear-sprite.idle");
+        document.querySelector(".bear-sprite.idle") &&
+        document.querySelector(".bear-sprite").tagName === "IMG" &&
+        document.querySelector(".bear-sprite").getAttribute("src").includes("bear-idle.png");
       const initialHealth = window.__usaOsEndBoss?.state.bearHealth;
       const initialAmmo = window.__usaOsEndBoss?.state.ammo;
       overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 640, clientY: 320 }));
@@ -75,10 +77,14 @@ try {
       const shotWorked =
         window.__usaOsEndBoss?.state.bearHealth < initialHealth &&
         window.__usaOsEndBoss?.state.ammo < initialAmmo &&
-        document.querySelector(".bear-sprite.hit");
+        document.querySelector(".bear-sprite.hit") &&
+        document.querySelector(".bear-sprite").getAttribute("src").includes("bear-hit.png");
       window.__usaOsEndBoss.forceAttack();
       await new Promise((resolve) => setTimeout(resolve, 30));
-      const attackVisible = document.querySelector(".bear-sprite.attacking") && !document.querySelector("#defend-button").disabled;
+      const attackVisible =
+        document.querySelector(".bear-sprite.attacking") &&
+        document.querySelector(".bear-sprite").getAttribute("src").includes("bear-attack.png") &&
+        !document.querySelector("#defend-button").disabled;
       document.querySelector("#defend-button").click();
       await new Promise((resolve) => setTimeout(resolve, 30));
       const defended = window.__usaOsEndBoss?.state.defended === true;

@@ -1,3 +1,9 @@
+const BEAR_SPRITES = {
+  idle: "./assets/images/bear-idle.png",
+  attacking: "./assets/images/bear-attack.png",
+  hit: "./assets/images/bear-hit.png",
+};
+
 export class EndBossBattle {
   constructor({ overlay, state, fireworks, popSounds }) {
     this.overlay = overlay;
@@ -158,6 +164,7 @@ export class EndBossBattle {
     this.refs.bear.classList.remove("idle", "attacking", "hit");
     this.refs.bear.classList.add(state);
     this.refs.bear.dataset.state = state;
+    this.refs.bear.src = BEAR_SPRITES[state] ?? BEAR_SPRITES.idle;
   }
 
   spawnShot(x, y) {

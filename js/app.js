@@ -505,6 +505,9 @@ function buildAssetManifest(economy) {
     { type: "image", src: "./assets/icons/tabs/history.png" },
     { type: "image", src: "./assets/icons/tabs/medals.png" },
     { type: "image", src: "./assets/sprites/eagle.png" },
+    { type: "image", src: "./assets/images/bear-idle.png" },
+    { type: "image", src: "./assets/images/bear-attack.png" },
+    { type: "image", src: "./assets/images/bear-hit.png" },
     ...economy.eras.map((era) => ({ type: "image", src: era.image })),
   ];
 }

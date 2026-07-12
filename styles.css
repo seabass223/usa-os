@@ -1575,41 +1575,13 @@ body.end-boss-active #game {
 
 .bear-sprite {
   position: relative;
-  width: 256px;
-  height: 256px;
-  background: #6b3a16;
-  border: 10px solid #2a1308;
+  width: min(420px, 58vw);
+  height: auto;
+  object-fit: contain;
   image-rendering: pixelated;
-  box-shadow:
-    -72px -62px 0 -28px #6b3a16,
-    72px -62px 0 -28px #6b3a16,
-    -88px 36px 0 -32px #4d260d,
-    88px 36px 0 -32px #4d260d,
-    0 24px 0 16px #4d260d,
-    0 40px 0 26px #2a1308;
-  transform: scale(1.1);
-}
-
-.bear-sprite::before {
-  position: absolute;
-  inset: 54px 44px auto;
-  height: 34px;
-  content: "";
-  background:
-    linear-gradient(90deg, #000 0 34px, transparent 34px 104px, #000 104px 138px),
-    linear-gradient(#c99a58 0 100%);
-}
-
-.bear-sprite::after {
-  position: absolute;
-  left: 50%;
-  bottom: 46px;
-  width: 86px;
-  height: 54px;
-  content: "";
-  background: #c99a58;
-  border: 8px solid #2a1308;
-  transform: translateX(-50%);
+  filter: drop-shadow(0 24px 0 rgba(0, 0, 0, 0.38));
+  transform: scale(1.08);
+  user-select: none;
 }
 
 .bear-sprite.idle {
@@ -1617,24 +1589,17 @@ body.end-boss-active #game {
 }
 
 .bear-sprite.attacking {
-  background: #8a2f12;
-  transform: translateY(-18px) scale(1.24);
-  box-shadow:
-    -116px 8px 0 -28px #6b3a16,
-    116px 8px 0 -28px #6b3a16,
-    0 34px 0 20px #4d260d,
-    0 54px 0 32px #2a1308;
+  transform: translateY(-18px) scale(1.18);
 }
 
 .bear-sprite.hit {
-  background: #b87a2c;
   transform: translateX(18px) rotate(2deg) scale(1.08);
-  filter: brightness(1.55);
+  filter: drop-shadow(0 24px 0 rgba(0, 0, 0, 0.38)) brightness(1.18);
 }
 
 @keyframes bear-idle {
-  0%, 100% { transform: translateY(0) scale(1.1); }
-  50% { transform: translateY(8px) scale(1.1); }
+  0%, 100% { transform: translateY(0) scale(1.08); }
+  50% { transform: translateY(8px) scale(1.08); }
 }
 
 .defend-button {

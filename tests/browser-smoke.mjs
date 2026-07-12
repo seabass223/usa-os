@@ -55,15 +55,29 @@ try {
 
   const endBoss = await evaluate(`
     (async () => {
+      const backgroundMusic = document.querySelector("#background-music");
+      backgroundMusic.volume = 0.45;
+      backgroundMusic.dataset.pauseCount = "0";
+      backgroundMusic.pause = () => {
+        backgroundMusic.dataset.pauseCount = String(Number(backgroundMusic.dataset.pauseCount || "0") + 1);
+      };
       for (const key of "usa250") {
         window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
       }
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const transitionStarted =
+        document.body.classList.contains("end-boss-transition") &&
+        document.querySelector("#game")?.classList.contains("shelf-knockoff") &&
+        Number(backgroundMusic.volume) < 0.45;
+      await new Promise((resolve) => setTimeout(resolve, 3400));
       const overlay = document.querySelector("#end-boss-overlay");
       const started =
+        transitionStarted &&
         overlay &&
         !overlay.hidden &&
         document.body.classList.contains("end-boss-active") &&
+        document.body.classList.contains("end-boss-transition-complete") &&
+        Number(backgroundMusic.dataset.pauseCount || "0") > 0 &&
         document.body.textContent.includes("A NEW PLAYER HAS ENTERED THE SIMULATION") &&
         document.querySelector("#boss-life-meter") &&
         document.querySelector("#boss-ammo-meter") &&

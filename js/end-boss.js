@@ -9,14 +9,17 @@ const FIREWORK_DAMAGE = 7;
 const EAGLE_STRIKE_DAMAGE = 85;
 const EAGLE_STRIKE_LIMIT = 3;
 const BEAR_ATTACK_DAMAGE = 30;
+const BATTLE_INTRO_DURATION = 3200;
+const SHELF_TARGETS = ["#intro-screen", ".usa-header", "#game"];
 
 export class EndBossBattle {
-  constructor({ overlay, state, fireworks, popSounds, eagleSounds }) {
+  constructor({ overlay, state, fireworks, popSounds, eagleSounds, backgroundMusic }) {
     this.overlay = overlay;
     this.stateRef = state;
     this.fireworks = fireworks;
     this.popSounds = popSounds;
     this.eagleSounds = eagleSounds;
+    this.backgroundMusic = backgroundMusic;
     this.state = {
       active: false,
       concluded: false,
@@ -29,6 +32,8 @@ export class EndBossBattle {
     };
     this.attackTimer = null;
     this.attackWindow = null;
+    this.transitionTimer = null;
+    this.fadeTimer = null;
     this.refs = {
       message: overlay.querySelector("#end-boss-message"),
       result: overlay.querySelector("#end-boss-result"),
@@ -54,7 +59,50 @@ export class EndBossBattle {
   }
 
   start({ cheat = false } = {}) {
-    if (this.state.active || this.state.concluded) return;
+    if (this.state.active || this.state.concluded || this.transitionTimer) return;
+    this.prepareFinaleTransition();
+    this.refs.message.textContent = cheat
+      ? "CHEAT ACCEPTED: A NEW PLAYER HAS ENTERED THE SIMULATION"
+      : "A NEW PLAYER HAS ENTERED THE SIMULATION";
+    this.transitionTimer = window.setTimeout(() => {
+      this.transitionTimer = null;
+      this.beginBattle();
+    }, BATTLE_INTRO_DURATION);
+  }
+
+  prepareFinaleTransition() {
+    document.body.classList.remove("end-boss-active", "end-boss-won", "end-boss-lost", "end-boss-transition-complete");
+    document.body.classList.add("end-boss-transition");
+    SHELF_TARGETS.forEach((selector, index) => {
+      const element = document.querySelector(selector);
+      if (!element) return;
+      element.classList.remove("shelf-knockoff");
+      element.style.setProperty("--shelf-delay", `${index * 1000}ms`);
+      void element.offsetWidth;
+      element.classList.add("shelf-knockoff");
+    });
+    this.fadeOutMusic();
+  }
+
+  fadeOutMusic() {
+    if (!this.backgroundMusic) return;
+    window.clearInterval(this.fadeTimer);
+    const startVolume = Number.isFinite(this.backgroundMusic.volume) ? this.backgroundMusic.volume : 0.45;
+    this.backgroundMusic.volume = Math.max(0, startVolume * 0.72);
+    const startedAt = performance.now();
+    this.fadeTimer = window.setInterval(() => {
+      const progress = Math.min(1, (performance.now() - startedAt) / 2200);
+      this.backgroundMusic.volume = Math.max(0, startVolume * (1 - progress));
+      if (progress >= 1) {
+        window.clearInterval(this.fadeTimer);
+        this.fadeTimer = null;
+        this.backgroundMusic.pause();
+        this.backgroundMusic.currentTime = 0;
+      }
+    }, 100);
+  }
+
+  beginBattle() {
     const stats = this.stateRef.stats;
     const production = Math.max(1, stats.cyclesPerSecond + stats.deployPerSecond);
     this.state = {
@@ -67,9 +115,6 @@ export class EndBossBattle {
       attacking: false,
       defended: false,
     };
-    this.refs.message.textContent = cheat
-      ? "CHEAT ACCEPTED: A NEW PLAYER HAS ENTERED THE SIMULATION"
-      : "A NEW PLAYER HAS ENTERED THE SIMULATION";
     this.refs.result.textContent = "Russian Bear end boss online. Click to fire fireworks. Defend when he lunges.";
     this.refs.cash.textContent = `FORMER CASH: ${formatFull(this.stateRef.progress)}`;
     this.refs.production.textContent = `FORMER PRODUCTION: ${formatFull(production)} / sec`;
@@ -77,8 +122,8 @@ export class EndBossBattle {
     this.refs.eagleStrike.disabled = false;
     this.setBearState("idle");
     this.overlay.hidden = false;
-    document.body.classList.add("end-boss-active");
-    document.body.classList.remove("end-boss-won", "end-boss-lost");
+    document.body.classList.add("end-boss-active", "end-boss-transition-complete");
+    document.body.classList.remove("end-boss-transition", "end-boss-won", "end-boss-lost");
     this.render();
     window.clearInterval(this.attackTimer);
     this.attackTimer = window.setInterval(() => this.forceAttack(), 2600);

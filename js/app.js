@@ -87,6 +87,7 @@ try {
     fireworks,
     popSounds,
     eagleSounds,
+    backgroundMusic: elements["background-music"],
   });
   window.__usaOsEndBoss = endBossBattle;
   const patrioticFireworks = {

@@ -1470,21 +1470,41 @@ pre {
   font-size: 0.72rem;
 }
 
-body.end-boss-active .intro-screen,
-body.end-boss-active .usa-header,
-body.end-boss-active #game {
+body.end-boss-transition {
+  animation: boss-screen-quake 3s steps(1, end) both;
+}
+
+body.end-boss-transition .shelf-knockoff {
   pointer-events: none;
-  animation: dom-explode-away 900ms steps(6, end) forwards !important;
+  transform-origin: center bottom;
+  animation: shelf-stab-fall 1.05s cubic-bezier(0.12, 0.72, 0.18, 1) var(--shelf-delay, 0ms) forwards !important;
+}
+
+body.end-boss-transition-complete .shelf-knockoff {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 body.end-boss-active .fireworks-canvas {
   z-index: 30001;
 }
 
-@keyframes dom-explode-away {
-  0% { opacity: 1; transform: translate(0, 0) rotate(0); filter: none; }
-  35% { opacity: 0.75; transform: translate(18px, -18px) rotate(2deg); filter: saturate(1.8); }
-  100% { opacity: 0; transform: translate(-120vw, 80vh) rotate(-18deg) scale(0.45); filter: blur(3px); }
+@keyframes boss-screen-quake {
+  0%, 20%, 40%, 60%, 80%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-8px, 5px); }
+  30% { transform: translate(7px, -6px); }
+  50% { transform: translate(-10px, -4px); }
+  70% { transform: translate(8px, 7px); }
+  90% { transform: translate(-5px, 4px); }
+}
+
+@keyframes shelf-stab-fall {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); filter: none; }
+  12% { transform: translate3d(-14px, -6px, 0) rotate(-1.5deg); filter: saturate(1.7); }
+  24% { transform: translate3d(18px, 8px, 0) rotate(2deg); }
+  36% { transform: translate3d(-10px, 12px, 0) rotate(-2.5deg); }
+  52% { opacity: 0.95; transform: translate3d(24px, 44px, 0) rotate(5deg); }
+  100% { opacity: 0; transform: translate3d(0, 118vh, 0) rotate(24deg) scale(0.94); filter: blur(2px); }
 }
 
 .end-boss-overlay[hidden] {
@@ -1502,6 +1522,12 @@ body.end-boss-active .fireworks-canvas {
     linear-gradient(rgba(8, 7, 12, 0.94), rgba(41, 18, 10, 0.98)),
     repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 6px);
   cursor: crosshair;
+  animation: end-boss-overlay-fade 900ms ease-out both;
+}
+
+@keyframes end-boss-overlay-fade {
+  from { opacity: 0; filter: brightness(0.35); }
+  to { opacity: 1; filter: brightness(1); }
 }
 
 .end-boss-hud {
@@ -1592,6 +1618,12 @@ body.end-boss-active .fireworks-canvas {
   animation: bear-idle 900ms steps(2, end) infinite;
 }
 
+body.end-boss-active .bear-sprite.idle {
+  animation:
+    bear-fade-in 900ms ease-out both,
+    bear-idle 900ms steps(2, end) 900ms infinite;
+}
+
 .bear-sprite.attacking {
   transform: translateY(-18px) scale(1.18);
 }
@@ -1599,6 +1631,12 @@ body.end-boss-active .fireworks-canvas {
 .bear-sprite.hit {
   transform: translateX(18px) rotate(2deg) scale(1.08);
   filter: drop-shadow(0 24px 0 rgba(0, 0, 0, 0.38)) brightness(1.18);
+}
+
+@keyframes bear-fade-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.82); filter: drop-shadow(0 24px 0 rgba(0, 0, 0, 0.38)) brightness(0.45); }
+  65% { opacity: 1; transform: translateY(-8px) scale(1.12); }
+  to { opacity: 1; transform: translateY(0) scale(1.08); filter: drop-shadow(0 24px 0 rgba(0, 0, 0, 0.38)) brightness(1); }
 }
 
 @keyframes bear-idle {

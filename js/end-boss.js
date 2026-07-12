@@ -80,20 +80,10 @@ export class EndBossBattle {
       return;
     }
     this.state.ammo -= 1;
-    this.state.bearHealth = Math.max(0, this.state.bearHealth - FIREWORK_DAMAGE);
     this.state.defended = false;
-    this.popSounds?.play();
-    this.spawnShot(event.clientX, event.clientY);
-    this.setBearState("hit");
-    this.refs.result.textContent = "Direct hit. Bear armor integrity falling.";
+    this.refs.result.textContent = "Bottle rocket launched — track the stream to impact.";
     this.render();
-    if (this.state.bearHealth <= 0) {
-      this.win();
-      return;
-    }
-    window.setTimeout(() => {
-      if (this.state.active && !this.state.attacking) this.setBearState("idle");
-    }, 220);
+    this.launchBottleRocket(event.clientX, event.clientY);
   }
 
   forceAttack() {
@@ -171,13 +161,43 @@ export class EndBossBattle {
     this.refs.bear.src = BEAR_SPRITES[state] ?? BEAR_SPRITES.idle;
   }
 
-  spawnShot(x, y) {
-    const shot = document.createElement("span");
-    shot.className = "bear-shot";
-    shot.style.left = `${x}px`;
-    shot.style.top = `${y}px`;
-    this.overlay.append(shot);
-    window.setTimeout(() => shot.remove(), 520);
+  launchBottleRocket(targetX, targetY) {
+    const bearBox = this.refs.bear.getBoundingClientRect();
+    const impactX = bearBox.left + bearBox.width / 2;
+    const impactY = bearBox.top + bearBox.height * 0.42;
+    const startX = clamp(targetX, 64, window.innerWidth - 64);
+    const startY = window.innerHeight + 32;
+    const rocket = document.createElement("span");
+    rocket.className = "bear-rocket";
+    rocket.style.setProperty("--start-x", `${startX}px`);
+    rocket.style.setProperty("--start-y", `${startY}px`);
+    rocket.style.setProperty("--target-x", `${impactX}px`);
+    rocket.style.setProperty("--target-y", `${impactY}px`);
+    this.overlay.append(rocket);
+    window.setTimeout(() => {
+      rocket.remove();
+      this.resolveRocketImpact(impactX, impactY);
+    }, 520);
+  }
+
+  resolveRocketImpact(x, y) {
+    if (!this.state.active || this.state.concluded) return;
+    this.state.bearHealth = Math.max(0, this.state.bearHealth - FIREWORK_DAMAGE);
+    this.popSounds?.play();
+    this.fireworks?.burst(x, y, {
+      colors: ["#d52b1e", "#ffffff", "#2878d0"],
+      particleCount: 24,
+    });
+    this.setBearState("hit");
+    this.refs.result.textContent = "Bottle rocket impact. Bear armor integrity falling.";
+    this.render();
+    if (this.state.bearHealth <= 0) {
+      this.win();
+      return;
+    }
+    window.setTimeout(() => {
+      if (this.state.active && !this.state.attacking) this.setBearState("idle");
+    }, 260);
   }
 
   render() {

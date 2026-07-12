@@ -1477,6 +1477,10 @@ body.end-boss-active #game {
   animation: dom-explode-away 900ms steps(6, end) forwards !important;
 }
 
+body.end-boss-active .fireworks-canvas {
+  z-index: 30001;
+}
+
 @keyframes dom-explode-away {
   0% { opacity: 1; transform: translate(0, 0) rotate(0); filter: none; }
   35% { opacity: 0.75; transform: translate(18px, -18px) rotate(2deg); filter: saturate(1.8); }
@@ -1615,19 +1619,38 @@ body.end-boss-active #game {
   50% { transform: scale(1.12); }
 }
 
-.bear-shot {
+.bear-rocket {
   position: fixed;
   z-index: 30002;
-  width: 16px;
-  height: 16px;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 28px;
   pointer-events: none;
-  background: #ffd86b;
-  box-shadow: 0 0 0 8px #d52b1e, 0 0 0 16px #2878d0;
-  animation: bear-shot-pop 520ms steps(5, end) forwards;
+  background:
+    linear-gradient(#ffffff 0 7px, #ffd86b 7px 16px, #d52b1e 16px 100%);
+  border: 2px solid #111;
+  box-shadow:
+    0 18px 0 -2px #ffffff,
+    0 30px 0 -4px #2878d0,
+    0 42px 0 -6px #d52b1e,
+    0 54px 0 -8px rgba(255, 216, 107, 0.9);
+  transform: translate(var(--start-x), var(--start-y)) rotate(-14deg);
+  animation: bottle-rocket-flight 520ms cubic-bezier(0.16, 0.82, 0.18, 1) forwards;
 }
 
-@keyframes bear-shot-pop {
-  to { transform: translateY(-90px) scale(3); opacity: 0; }
+@keyframes bottle-rocket-flight {
+  0% {
+    opacity: 1;
+    transform: translate(var(--start-x), var(--start-y)) rotate(-14deg) scale(1);
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.25;
+    transform: translate(var(--target-x), var(--target-y)) rotate(-14deg) scale(0.75);
+  }
 }
 
 body.end-boss-won .end-boss-overlay {

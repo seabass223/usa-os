@@ -74,13 +74,18 @@ try {
       const initialAmmo = window.__usaOsEndBoss?.state.ammo;
       const duelScaled = initialHealth >= 600 && initialAmmo >= 100;
       overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 640, clientY: 320 }));
-      await new Promise((resolve) => setTimeout(resolve, 80));
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      const rocketLaunched =
+        document.querySelector(".bear-rocket") &&
+        window.__usaOsEndBoss?.state.bearHealth === initialHealth &&
+        window.__usaOsEndBoss?.state.ammo < initialAmmo;
+      await new Promise((resolve) => setTimeout(resolve, 560));
       const shotWorked =
         window.__usaOsEndBoss?.state.bearHealth < initialHealth &&
         initialHealth - window.__usaOsEndBoss?.state.bearHealth <= 8 &&
-        window.__usaOsEndBoss?.state.ammo < initialAmmo &&
         document.querySelector(".bear-sprite.hit") &&
-        document.querySelector(".bear-sprite").getAttribute("src").includes("bear-hit.png");
+        document.querySelector(".bear-sprite").getAttribute("src").includes("bear-hit.png") &&
+        window.__usaOsFireworks?.particles.length > 0;
       window.__usaOsEndBoss.forceAttack();
       await new Promise((resolve) => setTimeout(resolve, 30));
       const attackVisible =
@@ -96,7 +101,7 @@ try {
         document.body.textContent.includes("BEAR DEFEATED") &&
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
-      return { started, duelScaled, shotWorked, attackVisible, defended, won };
+      return { started, duelScaled, rocketLaunched, shotWorked, attackVisible, defended, won };
     })()
   `);
 

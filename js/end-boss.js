@@ -6,20 +6,24 @@ const BEAR_SPRITES = {
 const BEAR_MAX_HEALTH = 700;
 const STARTING_AMMO = 120;
 const FIREWORK_DAMAGE = 7;
+const EAGLE_STRIKE_DAMAGE = 85;
+const EAGLE_STRIKE_LIMIT = 3;
 const BEAR_ATTACK_DAMAGE = 30;
 
 export class EndBossBattle {
-  constructor({ overlay, state, fireworks, popSounds }) {
+  constructor({ overlay, state, fireworks, popSounds, eagleSounds }) {
     this.overlay = overlay;
     this.stateRef = state;
     this.fireworks = fireworks;
     this.popSounds = popSounds;
+    this.eagleSounds = eagleSounds;
     this.state = {
       active: false,
       concluded: false,
       life: 100,
       ammo: 25,
       bearHealth: 100,
+      eagleStrikes: EAGLE_STRIKE_LIMIT,
       attacking: false,
       defended: false,
     };
@@ -33,13 +37,19 @@ export class EndBossBattle {
       cash: overlay.querySelector("#boss-cash-source"),
       production: overlay.querySelector("#boss-production-source"),
       health: overlay.querySelector("#bear-health-meter"),
+      eagleStrikeMeter: overlay.querySelector("#eagle-strike-meter"),
       bear: overlay.querySelector(".bear-sprite"),
       defend: overlay.querySelector("#defend-button"),
+      eagleStrike: overlay.querySelector("#eagle-strike-button"),
     };
     this.overlay.addEventListener("click", (event) => this.shoot(event));
     this.refs.defend.addEventListener("click", (event) => {
       event.stopPropagation();
       this.defend();
+    });
+    this.refs.eagleStrike.addEventListener("click", (event) => {
+      event.stopPropagation();
+      this.eagleStrike();
     });
   }
 
@@ -53,6 +63,7 @@ export class EndBossBattle {
       life: 100,
       ammo: STARTING_AMMO,
       bearHealth: BEAR_MAX_HEALTH,
+      eagleStrikes: EAGLE_STRIKE_LIMIT,
       attacking: false,
       defended: false,
     };
@@ -63,6 +74,7 @@ export class EndBossBattle {
     this.refs.cash.textContent = `FORMER CASH: ${formatFull(this.stateRef.progress)}`;
     this.refs.production.textContent = `FORMER PRODUCTION: ${formatFull(production)} / sec`;
     this.refs.defend.disabled = true;
+    this.refs.eagleStrike.disabled = false;
     this.setBearState("idle");
     this.overlay.hidden = false;
     document.body.classList.add("end-boss-active");
@@ -84,6 +96,37 @@ export class EndBossBattle {
     this.refs.result.textContent = "Bottle rocket launched — track the stream to impact.";
     this.render();
     this.launchBottleRocket(event.clientX, event.clientY);
+  }
+
+  eagleStrike() {
+    if (!this.state.active || this.state.concluded || this.state.eagleStrikes <= 0) return;
+    this.state.eagleStrikes -= 1;
+    this.refs.eagleStrike.disabled = this.state.eagleStrikes <= 0;
+    this.eagleSounds?.play();
+    this.launchEagleStrike();
+    this.state.bearHealth = Math.max(0, this.state.bearHealth - EAGLE_STRIKE_DAMAGE);
+    this.setBearState("hit");
+    this.refs.result.textContent = "Eagle strike connected. The bear reels from a freedom dive.";
+    this.fireworks?.burst(window.innerWidth * 0.5, window.innerHeight * 0.38, {
+      colors: ["#ffffff", "#ffd86b", "#2878d0"],
+      particleCount: 30,
+    });
+    this.render();
+    if (this.state.bearHealth <= 0) {
+      this.win();
+      return;
+    }
+    window.setTimeout(() => {
+      if (this.state.active && !this.state.attacking) this.setBearState("idle");
+    }, 320);
+  }
+
+  launchEagleStrike() {
+    const eagle = document.createElement("span");
+    eagle.className = "eagle-strike";
+    eagle.setAttribute("aria-hidden", "true");
+    this.overlay.append(eagle);
+    window.setTimeout(() => eagle.remove(), 1200);
   }
 
   forceAttack() {
@@ -127,6 +170,7 @@ export class EndBossBattle {
     window.clearInterval(this.attackTimer);
     window.clearTimeout(this.attackWindow);
     this.refs.defend.disabled = true;
+    this.refs.eagleStrike.disabled = true;
     this.setBearState("hit");
     this.refs.message.textContent = "BEAR DEFEATED";
     this.refs.result.textContent = "USA-OS FINAL VICTORY — congratulations, operator. The timeline holds.";
@@ -147,6 +191,7 @@ export class EndBossBattle {
     window.clearInterval(this.attackTimer);
     window.clearTimeout(this.attackWindow);
     this.refs.defend.disabled = true;
+    this.refs.eagleStrike.disabled = true;
     this.setBearState("attacking");
     this.refs.message.textContent = "TIMELINE OVERRUN";
     this.refs.result.textContent = "Life dropped to zero. The United States has been lost to the USSR.";
@@ -203,6 +248,7 @@ export class EndBossBattle {
     this.refs.life.textContent = `LIFE ${Math.round(this.state.life)}`;
     this.refs.ammo.textContent = `AMMO ${Math.round(this.state.ammo)}`;
     this.refs.health.textContent = `BEAR ${Math.round(this.state.bearHealth)}`;
+    this.refs.eagleStrikeMeter.textContent = `EAGLE STRIKES ${this.state.eagleStrikes}`;
     this.refs.life.style.setProperty("--meter", `${this.state.life}%`);
     this.refs.ammo.style.setProperty("--meter", `${(this.state.ammo / STARTING_AMMO) * 100}%`);
     this.refs.health.style.setProperty("--meter", `${(this.state.bearHealth / BEAR_MAX_HEALTH) * 100}%`);

@@ -91,6 +91,16 @@ try {
         document.querySelector(".bear-sprite.hit") &&
         document.querySelector(".bear-sprite").getAttribute("src").includes("bear-hit.png") &&
         window.__usaOsFireworks?.particles.length > 0;
+      const eagleButton = document.querySelector("#eagle-strike-button");
+      const eagleInitialHealth = window.__usaOsEndBoss?.state.bearHealth;
+      eagleButton?.click();
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      const eagleStrikeWorked =
+        window.__usaOsEndBoss?.state.eagleStrikes === 2 &&
+        window.__usaOsEndBoss?.state.bearHealth <= eagleInitialHealth - 70 &&
+        document.querySelector("#eagle-strike-meter")?.textContent.includes("2") &&
+        document.querySelector(".eagle-strike") &&
+        !document.querySelector(".eagle-flyover");
       window.__usaOsEndBoss.forceAttack();
       await new Promise((resolve) => setTimeout(resolve, 30));
       const attackVisible =
@@ -106,7 +116,7 @@ try {
         document.body.textContent.includes("BEAR DEFEATED") &&
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
-      return { started, duelScaled, rocketLaunched, shotWorked, attackVisible, defended, won };
+      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, won };
     })()
   `);
 

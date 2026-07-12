@@ -86,6 +86,7 @@ try {
     state,
     fireworks,
     popSounds,
+    eagleSounds,
   });
   window.__usaOsEndBoss = endBossBattle;
   const patrioticFireworks = {

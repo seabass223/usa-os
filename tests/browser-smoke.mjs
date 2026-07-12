@@ -75,8 +75,13 @@ try {
       const duelScaled = initialHealth >= 600 && initialAmmo >= 100;
       overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 640, clientY: 320 }));
       await new Promise((resolve) => setTimeout(resolve, 60));
+      const rocket = document.querySelector(".bear-rocket");
+      const rocketTargetedClick =
+        rocket?.style.getPropertyValue("--target-x") === "640px" &&
+        rocket?.style.getPropertyValue("--target-y") === "320px";
       const rocketLaunched =
-        document.querySelector(".bear-rocket") &&
+        rocket &&
+        rocketTargetedClick &&
         window.__usaOsEndBoss?.state.bearHealth === initialHealth &&
         window.__usaOsEndBoss?.state.ammo < initialAmmo;
       await new Promise((resolve) => setTimeout(resolve, 560));

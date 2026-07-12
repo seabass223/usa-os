@@ -162,9 +162,8 @@ export class EndBossBattle {
   }
 
   launchBottleRocket(targetX, targetY) {
-    const bearBox = this.refs.bear.getBoundingClientRect();
-    const impactX = bearBox.left + bearBox.width / 2;
-    const impactY = bearBox.top + bearBox.height * 0.42;
+    const impactX = clamp(targetX, 0, window.innerWidth);
+    const impactY = clamp(targetY, 0, window.innerHeight);
     const startX = clamp(targetX, 64, window.innerWidth - 64);
     const startY = window.innerHeight + 32;
     const rocket = document.createElement("span");

@@ -1,6 +1,7 @@
 import { loadGameData } from "./data-loader.js";
 import { preloadAssets } from "./asset-preloader.js";
 import { GameState } from "./game-state.js";
+import { EndBossBattle } from "./end-boss.js";
 import { PixelFireworks } from "./fireworks.js";
 import { SoundPool } from "./sound-pool.js";
 import {
@@ -80,6 +81,13 @@ try {
     volume: 0.9,
   });
   const soundPools = [popSounds, eraUnlockSound, coinSounds, eagleSounds];
+  const endBossBattle = new EndBossBattle({
+    overlay: document.querySelector("#end-boss-overlay"),
+    state,
+    fireworks,
+    popSounds,
+  });
+  window.__usaOsEndBoss = endBossBattle;
   const patrioticFireworks = {
     colors: ["#d52b1e", "#ffffff", "#2878d0"],
     onBurst: () => popSounds.play(),
@@ -291,6 +299,14 @@ try {
     announceNewAchievements();
 
     for (const component of components) component.render(state);
+    if (
+      state.achievements.length === economy.achievements.length &&
+      !endBossBattle.state.active &&
+      !endBossBattle.state.concluded
+    ) {
+      endBossBattle.start();
+      return;
+    }
     if (state.gameOver) {
       stopMusic();
       showGameOver(state);
@@ -429,11 +445,22 @@ try {
   state.addEventListener("change", render);
 
   window.addEventListener("keydown", (event) => {
+    recordCheatKey(event.key);
     if (elements["help-modal"].open) return;
     if (elements["game-screen"].hidden || event.repeat) return;
     if (event.key.toLowerCase() === "a") state.work(event.shiftKey ? 10 : 1);
     if (event.key.toLowerCase() === "b") state.deploy(event.shiftKey ? 10 : 1);
   });
+
+  let cheatBuffer = "";
+  const recordCheatKey = (key) => {
+    if (key.length !== 1) return;
+    cheatBuffer = `${cheatBuffer}${key.toLowerCase()}`.slice(-6);
+    if (cheatBuffer === "usa250") {
+      endBossBattle.start({ cheat: true });
+      cheatBuffer = "";
+    }
+  };
 } catch (error) {
   document.querySelector("#game").innerHTML = `
     <section class="panel">

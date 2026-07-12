@@ -1470,6 +1470,213 @@ pre {
   font-size: 0.72rem;
 }
 
+body.end-boss-active .intro-screen,
+body.end-boss-active .usa-header,
+body.end-boss-active #game {
+  pointer-events: none;
+  animation: dom-explode-away 900ms steps(6, end) forwards !important;
+}
+
+@keyframes dom-explode-away {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); filter: none; }
+  35% { opacity: 0.75; transform: translate(18px, -18px) rotate(2deg); filter: saturate(1.8); }
+  100% { opacity: 0; transform: translate(-120vw, 80vh) rotate(-18deg) scale(0.45); filter: blur(3px); }
+}
+
+.end-boss-overlay[hidden] {
+  display: none;
+}
+
+.end-boss-overlay {
+  position: fixed;
+  z-index: 30000;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at center, rgba(130, 0, 0, 0.55), transparent 34%),
+    linear-gradient(rgba(8, 7, 12, 0.94), rgba(41, 18, 10, 0.98)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 6px);
+  cursor: crosshair;
+}
+
+.end-boss-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  display: grid;
+  width: min(420px, calc(100vw - 28px));
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  animation: meters-dock 650ms steps(5, end) both;
+}
+
+@keyframes meters-dock {
+  from { transform: translate(45vw, 42vh) scale(1.8); }
+  to { transform: translate(0, 0) scale(1); }
+}
+
+.boss-meter {
+  position: relative;
+  margin: 0;
+  padding: 10px;
+  overflow: hidden;
+  color: white;
+  background: #130b08;
+  border: 4px solid white;
+  font-size: 0.58rem;
+}
+
+.boss-meter::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 0;
+  width: var(--meter, 100%);
+  content: "";
+  background: #d52b1e;
+}
+
+.boss-meter.ammo::before { background: #2878d0; }
+.boss-meter.bear-health::before { background: #7b3f17; }
+
+.end-boss-hud small {
+  display: block;
+  margin-top: 6px;
+  color: #ffd86b;
+  font-size: 0.45rem;
+}
+
+.end-boss-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.end-boss-message {
+  width: min(880px, calc(100vw - 32px));
+  color: #ffd86b;
+  font-size: clamp(0.8rem, 2.2vw, 1.35rem);
+  line-height: 1.6;
+  text-shadow: 4px 4px 0 #000;
+}
+
+.end-boss-result {
+  width: min(760px, calc(100vw - 32px));
+  min-height: 48px;
+  color: white;
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+.bear-sprite {
+  position: relative;
+  width: 256px;
+  height: 256px;
+  background: #6b3a16;
+  border: 10px solid #2a1308;
+  image-rendering: pixelated;
+  box-shadow:
+    -72px -62px 0 -28px #6b3a16,
+    72px -62px 0 -28px #6b3a16,
+    -88px 36px 0 -32px #4d260d,
+    88px 36px 0 -32px #4d260d,
+    0 24px 0 16px #4d260d,
+    0 40px 0 26px #2a1308;
+  transform: scale(1.1);
+}
+
+.bear-sprite::before {
+  position: absolute;
+  inset: 54px 44px auto;
+  height: 34px;
+  content: "";
+  background:
+    linear-gradient(90deg, #000 0 34px, transparent 34px 104px, #000 104px 138px),
+    linear-gradient(#c99a58 0 100%);
+}
+
+.bear-sprite::after {
+  position: absolute;
+  left: 50%;
+  bottom: 46px;
+  width: 86px;
+  height: 54px;
+  content: "";
+  background: #c99a58;
+  border: 8px solid #2a1308;
+  transform: translateX(-50%);
+}
+
+.bear-sprite.idle {
+  animation: bear-idle 900ms steps(2, end) infinite;
+}
+
+.bear-sprite.attacking {
+  background: #8a2f12;
+  transform: translateY(-18px) scale(1.24);
+  box-shadow:
+    -116px 8px 0 -28px #6b3a16,
+    116px 8px 0 -28px #6b3a16,
+    0 34px 0 20px #4d260d,
+    0 54px 0 32px #2a1308;
+}
+
+.bear-sprite.hit {
+  background: #b87a2c;
+  transform: translateX(18px) rotate(2deg) scale(1.08);
+  filter: brightness(1.55);
+}
+
+@keyframes bear-idle {
+  0%, 100% { transform: translateY(0) scale(1.1); }
+  50% { transform: translateY(8px) scale(1.1); }
+}
+
+.defend-button {
+  min-width: 180px;
+}
+
+.defend-button:not(:disabled) {
+  animation: defend-pulse 240ms steps(2, end) infinite;
+}
+
+@keyframes defend-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.bear-shot {
+  position: fixed;
+  z-index: 30002;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  background: #ffd86b;
+  box-shadow: 0 0 0 8px #d52b1e, 0 0 0 16px #2878d0;
+  animation: bear-shot-pop 520ms steps(5, end) forwards;
+}
+
+@keyframes bear-shot-pop {
+  to { transform: translateY(-90px) scale(3); opacity: 0; }
+}
+
+body.end-boss-won .end-boss-overlay {
+  background:
+    radial-gradient(circle at center, rgba(255, 216, 107, 0.5), transparent 38%),
+    linear-gradient(#071b3d, #143f8b);
+}
+
+body.end-boss-lost .end-boss-overlay {
+  background:
+    radial-gradient(circle at center, rgba(213, 43, 30, 0.42), transparent 38%),
+    linear-gradient(#190606, #090101);
+}
+
 @media (max-width: 1180px) {
   .desktop-shell {
     grid-template-columns: 250px minmax(0, 1fr);

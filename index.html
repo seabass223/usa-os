@@ -265,6 +265,26 @@ WAITING...</pre>
       </section>
     </main>
 
+    <section id="end-boss-overlay" class="end-boss-overlay" aria-label="USA-OS final boss battle" hidden>
+      <div class="end-boss-hud" aria-live="polite">
+        <div>
+          <p id="boss-life-meter" class="boss-meter life" style="--meter:100%">LIFE 100</p>
+          <small id="boss-cash-source">FORMER CASH: 0</small>
+        </div>
+        <div>
+          <p id="boss-ammo-meter" class="boss-meter ammo" style="--meter:100%">AMMO 25</p>
+          <small id="boss-production-source">FORMER PRODUCTION: 0 / sec</small>
+        </div>
+      </div>
+      <div class="end-boss-stage">
+        <p id="end-boss-message" class="end-boss-message">A NEW PLAYER HAS ENTERED THE SIMULATION</p>
+        <div class="bear-sprite idle" role="img" aria-label="Eight-bit Russian bear end boss"></div>
+        <p id="bear-health-meter" class="boss-meter bear-health" style="--meter:100%">BEAR 100</p>
+        <button id="defend-button" class="nes-btn is-error defend-button" type="button" disabled>DEFEND</button>
+        <p id="end-boss-result" class="end-boss-result">Click to firework. Defend when the bear attacks.</p>
+      </div>
+    </section>
+
     <noscript>This prototype requires JavaScript.</noscript>
     <script type="module" src="./js/app.js"></script>
   </body>

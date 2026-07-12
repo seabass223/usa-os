@@ -53,6 +53,52 @@ try {
   await send("Page.navigate", { url: "http://127.0.0.1:8000/" });
   await wait(750);
 
+  const endBoss = await evaluate(`
+    (async () => {
+      for (const key of "usa250") {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const overlay = document.querySelector("#end-boss-overlay");
+      const started =
+        overlay &&
+        !overlay.hidden &&
+        document.body.classList.contains("end-boss-active") &&
+        document.body.textContent.includes("A NEW PLAYER HAS ENTERED THE SIMULATION") &&
+        document.querySelector("#boss-life-meter") &&
+        document.querySelector("#boss-ammo-meter") &&
+        document.querySelector(".bear-sprite.idle");
+      const initialHealth = window.__usaOsEndBoss?.state.bearHealth;
+      const initialAmmo = window.__usaOsEndBoss?.state.ammo;
+      overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 640, clientY: 320 }));
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      const shotWorked =
+        window.__usaOsEndBoss?.state.bearHealth < initialHealth &&
+        window.__usaOsEndBoss?.state.ammo < initialAmmo &&
+        document.querySelector(".bear-sprite.hit");
+      window.__usaOsEndBoss.forceAttack();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      const attackVisible = document.querySelector(".bear-sprite.attacking") && !document.querySelector("#defend-button").disabled;
+      document.querySelector("#defend-button").click();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      const defended = window.__usaOsEndBoss?.state.defended === true;
+      window.__usaOsEndBoss.win();
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      const won =
+        document.body.textContent.includes("BEAR DEFEATED") &&
+        document.body.textContent.includes("USA-OS FINAL VICTORY") &&
+        window.__usaOsFireworks?.celebrationTimers.size > 0;
+      return { started, shotWorked, attackVisible, defended, won };
+    })()
+  `);
+
+  for (const [name, passed] of Object.entries(endBoss)) {
+    if (!passed) throw new Error(`End-boss assertion failed: ${name}`);
+  }
+
+  await send("Page.navigate", { url: "http://127.0.0.1:8000/" });
+  await wait(750);
+
   const result = await evaluate(`
     (async () => {
       const click = (selector, count = 1) => {

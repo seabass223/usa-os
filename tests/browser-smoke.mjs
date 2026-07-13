@@ -124,13 +124,16 @@ try {
       document.querySelector("#defend-button").click();
       await new Promise((resolve) => setTimeout(resolve, 30));
       const defended = window.__usaOsEndBoss?.state.defended === true;
+      const idleAnimationDidNotRestartIntro =
+        document.querySelector(".bear-sprite.idle") &&
+        !getComputedStyle(document.querySelector(".bear-sprite")).animationName.includes("bear-fade-in");
       window.__usaOsEndBoss.win();
       await new Promise((resolve) => setTimeout(resolve, 80));
       const won =
         document.body.textContent.includes("BEAR DEFEATED") &&
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
-      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, won };
+      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won };
     })()
   `);
 

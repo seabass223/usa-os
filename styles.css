@@ -1618,7 +1618,7 @@ body.end-boss-active .fireworks-canvas {
   animation: bear-idle 900ms steps(2, end) infinite;
 }
 
-body.end-boss-active .bear-sprite.idle {
+body.end-boss-active .bear-sprite.bear-intro.idle {
   animation:
     bear-fade-in 900ms ease-out both,
     bear-idle 900ms steps(2, end) 900ms infinite;

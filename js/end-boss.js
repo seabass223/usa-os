@@ -72,6 +72,7 @@ export class EndBossBattle {
 
   prepareFinaleTransition() {
     document.body.classList.remove("end-boss-active", "end-boss-won", "end-boss-lost", "end-boss-transition-complete");
+    this.refs.bear.classList.remove("bear-intro");
     document.body.classList.add("end-boss-transition");
     SHELF_TARGETS.forEach((selector, index) => {
       const element = document.querySelector(selector);
@@ -120,6 +121,8 @@ export class EndBossBattle {
     this.refs.production.textContent = `FORMER PRODUCTION: ${formatFull(production)} / sec`;
     this.refs.defend.disabled = true;
     this.refs.eagleStrike.disabled = false;
+    this.refs.bear.classList.add("bear-intro");
+    window.setTimeout(() => this.refs.bear.classList.remove("bear-intro"), 950);
     this.setBearState("idle");
     this.overlay.hidden = false;
     document.body.classList.add("end-boss-active", "end-boss-transition-complete");
@@ -245,6 +248,7 @@ export class EndBossBattle {
   }
 
   setBearState(state) {
+    if (state !== "idle") this.refs.bear.classList.remove("bear-intro");
     this.refs.bear.classList.remove("idle", "attacking", "hit");
     this.refs.bear.classList.add(state);
     this.refs.bear.dataset.state = state;

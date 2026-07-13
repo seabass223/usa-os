@@ -1485,6 +1485,11 @@ body.end-boss-transition-complete .shelf-knockoff {
   pointer-events: none;
 }
 
+body.end-boss-active::before,
+body.end-boss-transition-complete::before {
+  display: none;
+}
+
 body.end-boss-active .fireworks-canvas {
   z-index: 30001;
 }
@@ -1532,7 +1537,7 @@ body.end-boss-active .fireworks-canvas {
 
 .end-boss-hud {
   position: absolute;
-  top: min(74vh, calc(50% + 250px));
+  bottom: 8px;
   left: 50%;
   z-index: 2;
   display: grid;
@@ -1573,7 +1578,7 @@ body.end-boss-active .fireworks-canvas {
 
 .end-boss-hud small {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
   color: #ffd86b;
   font-size: 0.45rem;
 }
@@ -1597,6 +1602,10 @@ body.end-boss-active .fireworks-canvas {
 }
 
 .end-boss-result {
+  position: absolute;
+  bottom: 106px;
+  left: 50%;
+  transform: translateX(-50%);
   width: min(760px, calc(100vw - 32px));
   min-height: 48px;
   color: white;

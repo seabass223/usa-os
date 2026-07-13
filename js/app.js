@@ -81,13 +81,18 @@ try {
     initialSize: 3,
     volume: 0.9,
   });
-  const soundPools = [popSounds, eraUnlockSound, coinSounds, eagleSounds];
+  const boomSounds = new SoundPool("./assets/audio/boom.mp3", {
+    initialSize: 6,
+    volume: 0.95,
+  });
+  const soundPools = [popSounds, eraUnlockSound, coinSounds, eagleSounds, boomSounds];
   const endBossBattle = new EndBossBattle({
     overlay: document.querySelector("#end-boss-overlay"),
     state,
     fireworks,
     popSounds,
     eagleSounds,
+    boomSounds,
     backgroundMusic: elements["background-music"],
     bossMusic: elements["boss-music"],
   });
@@ -502,6 +507,7 @@ function buildAssetManifest(economy) {
     { type: "audio", src: "./assets/audio/boss-battle.mp3" },
     { type: "audio", src: "./assets/audio/coin.mp3" },
     { type: "audio", src: "./assets/audio/eagle.mp3" },
+    { type: "audio", src: "./assets/audio/boom.mp3" },
     { type: "audio", src: "./assets/audio/pop.mp3" },
     { type: "audio", src: "./assets/audio/vo-unlock.mp3" },
     { type: "audio", src: "./assets/audio/vo-usa-os.mp3" },

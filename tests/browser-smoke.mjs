@@ -121,6 +121,9 @@ try {
       const hudCenteredBelowBear =
         Math.abs(hudRect.left + hudRect.width / 2 - window.innerWidth / 2) < 80 &&
         hudRect.top > bearRect.bottom + 24;
+      const hudDockedLow = hudRect.bottom > window.innerHeight - 16;
+      const resultRect = document.querySelector("#end-boss-result").getBoundingClientRect();
+      const hudClearsResultText = resultRect.bottom < hudRect.top - 16;
       const initialHealth = window.__usaOsEndBoss?.state.bearHealth;
       const initialAmmo = window.__usaOsEndBoss?.state.ammo;
       const duelScaled = initialHealth >= 600 && initialAmmo >= 100;
@@ -178,7 +181,7 @@ try {
       const bossMusicStoppedOnWin = Number(bossMusic?.dataset.pauseCount || "0") > 0;
       const boomShakeSequence = transitionStarted && fastBoomStarted && window.__usaOsEndBoss.boomSounds.playCount >= 5;
       const starsRemoved = getComputedStyle(document.body, "::before").display === "none";
-      return { started, boomShakeSequence, starsRemoved, hudCenteredBelowBear, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, attackingImmunity, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
+      return { started, boomShakeSequence, starsRemoved, hudCenteredBelowBear, hudDockedLow, hudClearsResultText, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, attackingImmunity, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
     })()
   `);
 

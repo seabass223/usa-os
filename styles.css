@@ -1485,6 +1485,11 @@ body.end-boss-transition-complete .shelf-knockoff {
   pointer-events: none;
 }
 
+body.end-boss-active::before,
+body.end-boss-transition-complete::before {
+  display: none;
+}
+
 body.end-boss-active .fireworks-canvas {
   z-index: 30001;
 }
@@ -1532,7 +1537,7 @@ body.end-boss-active .fireworks-canvas {
 
 .end-boss-hud {
   position: absolute;
-  top: min(74vh, calc(50% + 250px));
+  top: min(84vh, calc(50% + 330px));
   left: 50%;
   z-index: 2;
   display: grid;

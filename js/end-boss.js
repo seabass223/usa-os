@@ -9,7 +9,7 @@ const FIREWORK_DAMAGE = 7;
 const EAGLE_STRIKE_DAMAGE = 85;
 const EAGLE_STRIKE_LIMIT = 3;
 const BEAR_ATTACK_DAMAGE = 30;
-const BATTLE_INTRO_DURATION = 3200;
+const BATTLE_INTRO_DURATION = 2200;
 const SHELF_TARGETS = [
   "#intro-screen",
   ".usa-header",
@@ -23,12 +23,13 @@ const SHELF_TARGETS = [
 ];
 
 export class EndBossBattle {
-  constructor({ overlay, state, fireworks, popSounds, eagleSounds, backgroundMusic, bossMusic }) {
+  constructor({ overlay, state, fireworks, popSounds, eagleSounds, boomSounds, backgroundMusic, bossMusic }) {
     this.overlay = overlay;
     this.stateRef = state;
     this.fireworks = fireworks;
     this.popSounds = popSounds;
     this.eagleSounds = eagleSounds;
+    this.boomSounds = boomSounds;
     this.backgroundMusic = backgroundMusic;
     this.bossMusic = bossMusic;
     this.state = {
@@ -89,8 +90,9 @@ export class EndBossBattle {
       const element = document.querySelector(selector);
       if (!element) return;
       element.classList.remove("shelf-knockoff");
-      const delay = index < 2 ? index * 1000 : 2000 + (index - 2) * 110;
+      const delay = index < 2 ? index * 360 : 720 + (index - 2) * 70;
       element.style.setProperty("--shelf-delay", `${delay}ms`);
+      window.setTimeout(() => this.boomSounds?.play(), delay);
       void element.offsetWidth;
       element.classList.add("shelf-knockoff");
     });
@@ -164,6 +166,10 @@ export class EndBossBattle {
   shoot(event) {
     if (!this.state.active || this.state.concluded) return;
     if (event.target.closest("#defend-button")) return;
+    if (this.state.attacking) {
+      this.refs.result.textContent = "Bear attack armor is active — wait for the lunge to end.";
+      return;
+    }
     if (this.state.ammo <= 0) {
       this.refs.result.textContent = "AMMO EMPTY — wait for production to recycle fireworks.";
       return;
@@ -177,6 +183,10 @@ export class EndBossBattle {
 
   eagleStrike() {
     if (!this.state.active || this.state.concluded || this.state.eagleStrikes <= 0) return;
+    if (this.state.attacking) {
+      this.refs.result.textContent = "Eagle strike waved off — the bear is immune mid-attack.";
+      return;
+    }
     this.state.eagleStrikes -= 1;
     this.refs.eagleStrike.disabled = this.state.eagleStrikes <= 0;
     this.eagleSounds?.play();
@@ -306,6 +316,14 @@ export class EndBossBattle {
 
   resolveRocketImpact(x, y) {
     if (!this.state.active || this.state.concluded) return;
+    if (this.state.attacking) {
+      this.fireworks?.burst(x, y, {
+        colors: ["#ffffff", "#ffd86b", "#2878d0"],
+        particleCount: 14,
+      });
+      this.refs.result.textContent = "Rocket splashed off attack armor. No damage.";
+      return;
+    }
     this.state.bearHealth = Math.max(0, this.state.bearHealth - FIREWORK_DAMAGE);
     this.popSounds?.play();
     this.fireworks?.burst(x, y, {

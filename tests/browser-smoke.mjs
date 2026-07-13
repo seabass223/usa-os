@@ -55,8 +55,14 @@ try {
 
   const endBoss = await evaluate(`
     (async () => {
-      const backgroundMusic = document.querySelector("#background-music");
-      const bossMusic = document.querySelector("#boss-music");
+      let backgroundMusic = document.querySelector("#background-music");
+      let bossMusic = document.querySelector("#boss-music");
+      for (let attempt = 0; attempt < 40 && !backgroundMusic; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        backgroundMusic = document.querySelector("#background-music");
+        bossMusic = document.querySelector("#boss-music");
+      }
+      if (!backgroundMusic) return { pageLoaded: false };
       backgroundMusic.volume = 0.45;
       backgroundMusic.dataset.pauseCount = "0";
       backgroundMusic.pause = () => {
@@ -73,6 +79,9 @@ try {
           bossMusic.dataset.pauseCount = String(Number(bossMusic.dataset.pauseCount || "0") + 1);
         };
       }
+      window.__usaOsEndBoss.boomSounds.play = () => {
+        window.__usaOsEndBoss.boomSounds.playCount = (window.__usaOsEndBoss.boomSounds.playCount || 0) + 1;
+      };
       for (const key of "usa250") {
         window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
       }
@@ -87,10 +96,12 @@ try {
         !document.querySelector("#game")?.classList.contains("shelf-knockoff") &&
         independentSubpanelKnockoff &&
         Number(backgroundMusic.volume) < 0.45;
-      await new Promise((resolve) => setTimeout(resolve, 3400));
+      const fastBoomStarted =
+        window.__usaOsEndBoss.boomSounds.playCount >= 1 &&
+        Number.parseInt(document.querySelector(".workspace-panel")?.style.getPropertyValue("--shelf-delay"), 10) <= 1200;
+      await new Promise((resolve) => setTimeout(resolve, 2400));
       const overlay = document.querySelector("#end-boss-overlay");
       const started =
-        transitionStarted &&
         overlay &&
         !overlay.hidden &&
         document.body.classList.contains("end-boss-active") &&
@@ -109,7 +120,7 @@ try {
       const bearRect = document.querySelector(".bear-sprite").getBoundingClientRect();
       const hudCenteredBelowBear =
         Math.abs(hudRect.left + hudRect.width / 2 - window.innerWidth / 2) < 80 &&
-        hudRect.top > bearRect.bottom - 80;
+        hudRect.top > bearRect.bottom + 24;
       const initialHealth = window.__usaOsEndBoss?.state.bearHealth;
       const initialAmmo = window.__usaOsEndBoss?.state.ammo;
       const duelScaled = initialHealth >= 600 && initialAmmo >= 100;
@@ -147,6 +158,11 @@ try {
         document.querySelector(".bear-sprite.attacking") &&
         document.querySelector(".bear-sprite").getAttribute("src").includes("bear-attack.png") &&
         !document.querySelector("#defend-button").disabled;
+      const attackingHealth = window.__usaOsEndBoss?.state.bearHealth;
+      overlay.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: 500, clientY: 280 }));
+      eagleButton?.click();
+      await new Promise((resolve) => setTimeout(resolve, 640));
+      const attackingImmunity = window.__usaOsEndBoss?.state.bearHealth === attackingHealth;
       document.querySelector("#defend-button").click();
       await new Promise((resolve) => setTimeout(resolve, 30));
       const defended = window.__usaOsEndBoss?.state.defended === true;
@@ -160,12 +176,14 @@ try {
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
       const bossMusicStoppedOnWin = Number(bossMusic?.dataset.pauseCount || "0") > 0;
-      return { started, hudCenteredBelowBear, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
+      const boomShakeSequence = transitionStarted && fastBoomStarted && window.__usaOsEndBoss.boomSounds.playCount >= 5;
+      const starsRemoved = getComputedStyle(document.body, "::before").display === "none";
+      return { started, boomShakeSequence, starsRemoved, hudCenteredBelowBear, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, attackingImmunity, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
     })()
   `);
 
   for (const [name, passed] of Object.entries(endBoss)) {
-    if (!passed) throw new Error(`End-boss assertion failed: ${name}`);
+    if (!passed) throw new Error(`End-boss assertion failed: ${name} ${JSON.stringify(endBoss)}`);
   }
 
   await send("Page.navigate", { url: "http://127.0.0.1:8000/" });
@@ -175,7 +193,7 @@ try {
       for (const key of "usa250") {
         window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
       }
-      await new Promise((resolve) => setTimeout(resolve, 3400));
+      await new Promise((resolve) => setTimeout(resolve, 2400));
       window.__usaOsEndBoss.lose();
       await new Promise((resolve) => setTimeout(resolve, 1400));
       return {

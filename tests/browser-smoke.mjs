@@ -56,11 +56,23 @@ try {
   const endBoss = await evaluate(`
     (async () => {
       const backgroundMusic = document.querySelector("#background-music");
+      const bossMusic = document.querySelector("#boss-music");
       backgroundMusic.volume = 0.45;
       backgroundMusic.dataset.pauseCount = "0";
       backgroundMusic.pause = () => {
         backgroundMusic.dataset.pauseCount = String(Number(backgroundMusic.dataset.pauseCount || "0") + 1);
       };
+      if (bossMusic) {
+        bossMusic.dataset.playCount = "0";
+        bossMusic.dataset.pauseCount = "0";
+        bossMusic.play = () => {
+          bossMusic.dataset.playCount = String(Number(bossMusic.dataset.playCount || "0") + 1);
+          return Promise.resolve();
+        };
+        bossMusic.pause = () => {
+          bossMusic.dataset.pauseCount = String(Number(bossMusic.dataset.pauseCount || "0") + 1);
+        };
+      }
       for (const key of "usa250") {
         window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
       }
@@ -78,6 +90,9 @@ try {
         document.body.classList.contains("end-boss-active") &&
         document.body.classList.contains("end-boss-transition-complete") &&
         Number(backgroundMusic.dataset.pauseCount || "0") > 0 &&
+        bossMusic?.getAttribute("src")?.includes("boss-battle.mp3") &&
+        Number(bossMusic?.dataset.playCount || "0") > 0 &&
+        Number(bossMusic?.volume || 0) > 0 &&
         document.body.textContent.includes("A NEW PLAYER HAS ENTERED THE SIMULATION") &&
         document.querySelector("#boss-life-meter") &&
         document.querySelector("#boss-ammo-meter") &&
@@ -133,7 +148,8 @@ try {
         document.body.textContent.includes("BEAR DEFEATED") &&
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
-      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won };
+      const bossMusicStoppedOnWin = Number(bossMusic?.dataset.pauseCount || "0") > 0;
+      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
     })()
   `);
 

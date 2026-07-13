@@ -33,6 +33,7 @@ const elements = Object.fromEntries(
     "start-game",
     "continue-game",
     "background-music",
+    "boss-music",
     "work-button",
     "deploy-button",
     "work-output",
@@ -88,6 +89,7 @@ try {
     popSounds,
     eagleSounds,
     backgroundMusic: elements["background-music"],
+    bossMusic: elements["boss-music"],
   });
   window.__usaOsEndBoss = endBossBattle;
   const patrioticFireworks = {
@@ -126,7 +128,7 @@ try {
     elements["boss-mode-toggle"].setAttribute("aria-pressed", String(enabled));
     elements["boss-mode-toggle"].textContent = enabled ? "EXIT BOSS" : "BOSS MODE";
     localStorage.setItem("usa-os-boss-mode", enabled ? "1" : "0");
-    for (const audio of [elements["background-music"], elements["intro-voice"]]) {
+    for (const audio of [elements["background-music"], elements["boss-music"], elements["intro-voice"]]) {
       audio.muted = enabled;
       if (enabled) audio.pause();
     }
@@ -497,6 +499,7 @@ function buildAssetManifest(economy) {
   return [
     { type: "font", name: "Press Start 2P" },
     { type: "audio", src: "./assets/audio/Usa-Os.mp3" },
+    { type: "audio", src: "./assets/audio/boss-battle.mp3" },
     { type: "audio", src: "./assets/audio/coin.mp3" },
     { type: "audio", src: "./assets/audio/eagle.mp3" },
     { type: "audio", src: "./assets/audio/pop.mp3" },

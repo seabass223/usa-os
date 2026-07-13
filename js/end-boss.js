@@ -13,13 +13,14 @@ const BATTLE_INTRO_DURATION = 3200;
 const SHELF_TARGETS = ["#intro-screen", ".usa-header", "#game"];
 
 export class EndBossBattle {
-  constructor({ overlay, state, fireworks, popSounds, eagleSounds, backgroundMusic }) {
+  constructor({ overlay, state, fireworks, popSounds, eagleSounds, backgroundMusic, bossMusic }) {
     this.overlay = overlay;
     this.stateRef = state;
     this.fireworks = fireworks;
     this.popSounds = popSounds;
     this.eagleSounds = eagleSounds;
     this.backgroundMusic = backgroundMusic;
+    this.bossMusic = bossMusic;
     this.state = {
       active: false,
       concluded: false,
@@ -103,6 +104,22 @@ export class EndBossBattle {
     }, 100);
   }
 
+  startBossMusic() {
+    if (!this.bossMusic || document.body.classList.contains("boss-mode")) return;
+    this.bossMusic.currentTime = 0;
+    this.bossMusic.volume = 0.62;
+    this.bossMusic.muted = false;
+    this.bossMusic.play().catch(() => {
+      // Playback remains optional if the browser blocks audio.
+    });
+  }
+
+  stopBossMusic() {
+    if (!this.bossMusic) return;
+    this.bossMusic.pause();
+    this.bossMusic.currentTime = 0;
+  }
+
   beginBattle() {
     const stats = this.stateRef.stats;
     const production = Math.max(1, stats.cyclesPerSecond + stats.deployPerSecond);
@@ -128,6 +145,7 @@ export class EndBossBattle {
     document.body.classList.add("end-boss-active", "end-boss-transition-complete");
     document.body.classList.remove("end-boss-transition", "end-boss-won", "end-boss-lost");
     this.render();
+    this.startBossMusic();
     window.clearInterval(this.attackTimer);
     this.attackTimer = window.setInterval(() => this.forceAttack(), 2600);
   }
@@ -219,6 +237,7 @@ export class EndBossBattle {
     window.clearTimeout(this.attackWindow);
     this.refs.defend.disabled = true;
     this.refs.eagleStrike.disabled = true;
+    this.stopBossMusic();
     this.setBearState("hit");
     this.refs.message.textContent = "BEAR DEFEATED";
     this.refs.result.textContent = "USA-OS FINAL VICTORY — congratulations, operator. The timeline holds.";
@@ -240,6 +259,7 @@ export class EndBossBattle {
     window.clearTimeout(this.attackWindow);
     this.refs.defend.disabled = true;
     this.refs.eagleStrike.disabled = true;
+    this.stopBossMusic();
     this.setBearState("attacking");
     this.refs.message.textContent = "TIMELINE OVERRUN";
     this.refs.result.textContent = "Life dropped to zero. The United States has been lost to the USSR.";

@@ -1532,19 +1532,20 @@ body.end-boss-active .fireworks-canvas {
 
 .end-boss-hud {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: min(74vh, calc(50% + 250px));
+  left: 50%;
   z-index: 2;
   display: grid;
-  width: min(420px, calc(100vw - 28px));
+  width: min(520px, calc(100vw - 28px));
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  transform: translateX(-50%);
   animation: meters-dock 650ms steps(5, end) both;
 }
 
 @keyframes meters-dock {
-  from { transform: translate(45vw, 42vh) scale(1.8); }
-  to { transform: translate(0, 0) scale(1); }
+  from { transform: translateX(-50%) translateY(120px) scale(1.45); }
+  to { transform: translateX(-50%) translateY(0) scale(1); }
 }
 
 .boss-meter {
@@ -1745,6 +1746,61 @@ body.end-boss-lost .end-boss-overlay {
   background:
     radial-gradient(circle at center, rgba(213, 43, 30, 0.42), transparent 38%),
     linear-gradient(#190606, #090101);
+}
+
+body.end-boss-crt-failed .end-boss-overlay {
+  animation: crt-collapse 1.05s steps(8, end) forwards;
+}
+
+body.end-boss-crt-failed .end-boss-stage > :not(.end-boss-result) {
+  opacity: 0;
+  transition: opacity 180ms steps(2, end);
+}
+
+body.end-boss-crt-failed .end-boss-hud,
+body.end-boss-crt-failed .boss-actions,
+body.end-boss-crt-failed .eagle-strike-meter {
+  display: none;
+}
+
+body.end-boss-crt-failed .end-boss-result {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 32ch;
+  min-height: 1.4em;
+  overflow: hidden;
+  color: #7cff8a;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: clamp(1rem, 3vw, 2.1rem);
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-shadow: 0 0 10px rgba(124, 255, 138, 0.8);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  animation: failed-boot-type 1.1s steps(25, end) 600ms both;
+}
+
+body.end-boss-crt-failed .end-boss-result::after {
+  content: "_";
+  animation: boot-cursor 420ms steps(1, end) infinite;
+}
+
+@keyframes crt-collapse {
+  0% { clip-path: inset(0 0 0 0); filter: brightness(1.25); }
+  50% { clip-path: inset(42% 0 42% 0); filter: brightness(1.8); }
+  72% { clip-path: inset(49% 0 49% 0); filter: brightness(4); }
+  100% { clip-path: inset(0 0 0 0); filter: brightness(0.72) contrast(1.45); background: #020402; }
+}
+
+@keyframes failed-boot-type {
+  from { max-width: 0; }
+  to { max-width: 32ch; }
+}
+
+@keyframes boot-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 @media (max-width: 1180px) {

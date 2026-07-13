@@ -77,9 +77,15 @@ try {
         window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
       }
       await new Promise((resolve) => setTimeout(resolve, 150));
+      const knockedPanels = [...document.querySelectorAll(".shelf-knockoff")].map((node) => node.className);
+      const independentSubpanelKnockoff =
+        knockedPanels.some((name) => name.includes("system-sidebar")) &&
+        knockedPanels.some((name) => name.includes("workspace-panel")) &&
+        knockedPanels.some((name) => name.includes("log-panel"));
       const transitionStarted =
         document.body.classList.contains("end-boss-transition") &&
-        document.querySelector("#game")?.classList.contains("shelf-knockoff") &&
+        !document.querySelector("#game")?.classList.contains("shelf-knockoff") &&
+        independentSubpanelKnockoff &&
         Number(backgroundMusic.volume) < 0.45;
       await new Promise((resolve) => setTimeout(resolve, 3400));
       const overlay = document.querySelector("#end-boss-overlay");
@@ -99,6 +105,11 @@ try {
         document.querySelector(".bear-sprite.idle") &&
         document.querySelector(".bear-sprite").tagName === "IMG" &&
         document.querySelector(".bear-sprite").getAttribute("src").includes("bear-idle.png");
+      const hudRect = document.querySelector(".end-boss-hud").getBoundingClientRect();
+      const bearRect = document.querySelector(".bear-sprite").getBoundingClientRect();
+      const hudCenteredBelowBear =
+        Math.abs(hudRect.left + hudRect.width / 2 - window.innerWidth / 2) < 80 &&
+        hudRect.top > bearRect.bottom - 80;
       const initialHealth = window.__usaOsEndBoss?.state.bearHealth;
       const initialAmmo = window.__usaOsEndBoss?.state.ammo;
       const duelScaled = initialHealth >= 600 && initialAmmo >= 100;
@@ -149,12 +160,34 @@ try {
         document.body.textContent.includes("USA-OS FINAL VICTORY") &&
         window.__usaOsFireworks?.celebrationTimers.size > 0;
       const bossMusicStoppedOnWin = Number(bossMusic?.dataset.pauseCount || "0") > 0;
-      return { started, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
+      return { started, hudCenteredBelowBear, duelScaled, rocketLaunched, shotWorked, eagleStrikeWorked, attackVisible, defended, idleAnimationDidNotRestartIntro, won, bossMusicStoppedOnWin };
     })()
   `);
 
   for (const [name, passed] of Object.entries(endBoss)) {
     if (!passed) throw new Error(`End-boss assertion failed: ${name}`);
+  }
+
+  await send("Page.navigate", { url: "http://127.0.0.1:8000/" });
+  await wait(750);
+  const bossLoss = await evaluate(`
+    (async () => {
+      for (const key of "usa250") {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 3400));
+      window.__usaOsEndBoss.lose();
+      await new Promise((resolve) => setTimeout(resolve, 1400));
+      return {
+        crtCollapsed: document.body.classList.contains("end-boss-lost") &&
+          document.body.classList.contains("end-boss-crt-failed"),
+        bootText: document.body.textContent.includes("U.S.A.O.S. FAILED TO BOOT"),
+        consoleFont: getComputedStyle(document.querySelector("#end-boss-result")).fontFamily.toLowerCase().includes("consol"),
+      };
+    })()
+  `);
+  for (const [name, passed] of Object.entries(bossLoss)) {
+    if (!passed) throw new Error(`End-boss loss assertion failed: ${name}`);
   }
 
   await send("Page.navigate", { url: "http://127.0.0.1:8000/" });

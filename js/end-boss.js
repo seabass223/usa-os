@@ -10,7 +10,17 @@ const EAGLE_STRIKE_DAMAGE = 85;
 const EAGLE_STRIKE_LIMIT = 3;
 const BEAR_ATTACK_DAMAGE = 30;
 const BATTLE_INTRO_DURATION = 3200;
-const SHELF_TARGETS = ["#intro-screen", ".usa-header", "#game"];
+const SHELF_TARGETS = [
+  "#intro-screen",
+  ".usa-header",
+  ".system-sidebar",
+  ".sidebar-controls",
+  ".log-panel",
+  ".command-center",
+  "#status-bar",
+  ".workspace-panel",
+  ".tab-panel.active",
+];
 
 export class EndBossBattle {
   constructor({ overlay, state, fireworks, popSounds, eagleSounds, backgroundMusic, bossMusic }) {
@@ -72,14 +82,15 @@ export class EndBossBattle {
   }
 
   prepareFinaleTransition() {
-    document.body.classList.remove("end-boss-active", "end-boss-won", "end-boss-lost", "end-boss-transition-complete");
+    document.body.classList.remove("end-boss-active", "end-boss-won", "end-boss-lost", "end-boss-crt-failed", "end-boss-transition-complete");
     this.refs.bear.classList.remove("bear-intro");
     document.body.classList.add("end-boss-transition");
     SHELF_TARGETS.forEach((selector, index) => {
       const element = document.querySelector(selector);
       if (!element) return;
       element.classList.remove("shelf-knockoff");
-      element.style.setProperty("--shelf-delay", `${index * 1000}ms`);
+      const delay = index < 2 ? index * 1000 : 2000 + (index - 2) * 110;
+      element.style.setProperty("--shelf-delay", `${delay}ms`);
       void element.offsetWidth;
       element.classList.add("shelf-knockoff");
     });
@@ -143,7 +154,7 @@ export class EndBossBattle {
     this.setBearState("idle");
     this.overlay.hidden = false;
     document.body.classList.add("end-boss-active", "end-boss-transition-complete");
-    document.body.classList.remove("end-boss-transition", "end-boss-won", "end-boss-lost");
+    document.body.classList.remove("end-boss-transition", "end-boss-won", "end-boss-lost", "end-boss-crt-failed");
     this.render();
     this.startBossMusic();
     window.clearInterval(this.attackTimer);
@@ -262,8 +273,8 @@ export class EndBossBattle {
     this.stopBossMusic();
     this.setBearState("attacking");
     this.refs.message.textContent = "TIMELINE OVERRUN";
-    this.refs.result.textContent = "Life dropped to zero. The United States has been lost to the USSR.";
-    document.body.classList.add("end-boss-lost");
+    this.refs.result.textContent = "U.S.A.O.S. FAILED TO BOOT";
+    document.body.classList.add("end-boss-lost", "end-boss-crt-failed");
     this.render();
   }
 
